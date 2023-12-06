@@ -14,4 +14,8 @@ services:
     ports:
       - ${DATABASE_PORT}:5432
     volumes:
-      - ./pgdata:/var/lib/postgresql/data/
+      - ./setup/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pb_pgdata:/var/lib/postgresql/data/
+
+volumes:
+  pb_pgdata:
