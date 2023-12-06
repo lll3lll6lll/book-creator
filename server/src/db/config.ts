@@ -5,7 +5,6 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 import { extname, join } from 'path';
 import * as process from 'process';
 
-
 export const dbConfig: PostgresConnectionOptions = {
   type: 'postgres',
   entities: [join(__dirname, `./../**/*.{entity,view}${extname(__filename)}`)],
@@ -19,6 +18,9 @@ export const dbConfig: PostgresConnectionOptions = {
   schema: process.env.DATABASE_SCHEMA,
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
-  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
-  poolSize: process.env.DATABASE_POOL_SIZE ? +process.env.DATABASE_POOL_SIZE || 40 : 40,
+  ssl:
+    process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  poolSize: process.env.DATABASE_POOL_SIZE
+    ? +process.env.DATABASE_POOL_SIZE || 40
+    : 40,
 };
