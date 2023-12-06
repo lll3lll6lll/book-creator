@@ -1,17 +1,20 @@
 import { BaseEntity } from '@src/db/base-entity/base.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Field } from '@nestjs/graphql';
+import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Field, ID, ObjectType} from "@nestjs/graphql";
+
 
 @Entity()
+@ObjectType()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @Field(() => ID)
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Field()
-  @Column()
-  email: string;
+    @Field()
+    @Column()
+    email: string
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  name: string;
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    name: string
 }
