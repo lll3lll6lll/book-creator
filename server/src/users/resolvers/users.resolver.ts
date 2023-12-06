@@ -12,12 +12,12 @@ export class UsersResolver {
     }
 
     @Mutation(() => User)
-    async createUser(@Args('createUser') createUserInput: CreateUserInput): Promise<User> {
+    async createUser(@Args({name: "dto", type: () => CreateUserInput}) createUserInput: CreateUserInput): Promise<User> {
         return await this.userService.createUser(createUserInput)
     }
 
     @Mutation(() => User)
-    async updateUser(@Args('updateUser') updateUserInput: UpdateUserInput): Promise<User> {
+    async updateUser(@Args({name: "dto", type: () => UpdateUserInput}) updateUserInput: UpdateUserInput): Promise<User> {
         return await this.userService.updateUser(updateUserInput)
     }
 

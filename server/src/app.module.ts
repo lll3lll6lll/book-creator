@@ -12,14 +12,13 @@ import {dbConfig} from "@src/db/config";
       ConfigModule.forRoot({isGlobal: true, envFilePath: '../.env'}),
       TypeOrmModule.forRoot(dbConfig),
       GraphQLModule.forRoot<ApolloDriverConfig>({
-          autoSchemaFile: 'schema.gql',
-          sortSchema: true,
-          playground: true,
-          driver: ApolloDriver,
+        driver: ApolloDriver,
+        autoSchemaFile: true,
+        playground: true,
+        introspection: true,
       }),
       UsersModule,
   ],
   controllers: [],
-  providers: [UsersService],
 })
 export class AppModule {}
