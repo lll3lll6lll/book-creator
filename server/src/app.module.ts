@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersModule } from '@src/users/users.module';
-import { UsersService } from '@src/users/services/users.service';
 import { dbConfig } from '@src/db/config';
+import { BooksModule } from './books/books.module';
 
 @Module({
   imports: [
@@ -18,6 +18,7 @@ import { dbConfig } from '@src/db/config';
       introspection: true,
     }),
     UsersModule,
+    BooksModule,
   ],
   controllers: [],
 })
