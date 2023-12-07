@@ -7,6 +7,9 @@ import { UsersModule } from '@src/users/users.module';
 import { dbConfig } from '@src/db/config';
 import { BooksModule } from './books/books.module';
 import { CommentsModule } from './comments/comments.module';
+import { AppContextModule } from '@src/app-context/module';
+import { AppInterceptor } from '@src/app.interceptor';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -21,7 +24,9 @@ import { CommentsModule } from './comments/comments.module';
     UsersModule,
     BooksModule,
     CommentsModule,
+    AppContextModule,
   ],
   controllers: [],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: AppInterceptor }],
 })
 export class AppModule {}
