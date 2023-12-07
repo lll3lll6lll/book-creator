@@ -20,10 +20,6 @@ export class UsersService {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return await this.userRepository.find();
-  }
-
   async removeUser(id: string): Promise<string> {
     await this.userRepository.delete({ id });
     return id;

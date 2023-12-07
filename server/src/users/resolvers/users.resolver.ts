@@ -33,9 +33,4 @@ export class UsersResolver {
   async getOneUser(@Args('id') id: string): Promise<User> {
     return await this.userService.getOneUser(id);
   }
-
-  @Query(() => [User])
-  async getAllUsers(): Promise<User[]> {
-    return await this.userService.getAllUsers();
-  }
 }

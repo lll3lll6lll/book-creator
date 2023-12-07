@@ -6,6 +6,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersModule } from '@src/users/users.module';
 import { dbConfig } from '@src/db/config';
 import { BooksModule } from './books/books.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { BooksModule } from './books/books.module';
     }),
     UsersModule,
     BooksModule,
+    CommentsModule,
   ],
   controllers: [],
 })
