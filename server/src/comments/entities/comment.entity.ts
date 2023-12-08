@@ -6,8 +6,8 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class Comment extends BaseEntity {
   @Field(() => ID)
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Field()
   @Column()

@@ -16,7 +16,7 @@ export class BooksService {
     return await this.bookRepository.save({ ...bookCreate });
   }
 
-  async getOneBook(id: string): Promise<Book> {
+  async getOneBook(id: number): Promise<Book> {
     return await this.bookRepository.findOneBy({ id });
   }
 
@@ -25,7 +25,7 @@ export class BooksService {
     return await this.getOneBook(bookUpdate.id);
   }
 
-  async removeBook(id: string): Promise<string> {
+  async removeBook(id: number): Promise<number> {
     await this.bookRepository.delete({ id });
     return id;
   }

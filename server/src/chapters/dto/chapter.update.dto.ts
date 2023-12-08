@@ -3,7 +3,7 @@ import { Field, ID, InputType } from '@nestjs/graphql';
 @InputType()
 export class ChapterUpdate {
   @Field(() => ID)
-  id: string;
+  id: number;
 
   @Field()
   title?: string;

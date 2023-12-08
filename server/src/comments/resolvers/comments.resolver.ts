@@ -25,12 +25,12 @@ export class CommentsResolver {
   }
 
   @Mutation(() => Number)
-  async removeUser(@Args('id') id: string): Promise<string> {
+  async removeUser(@Args('id') id: number): Promise<number> {
     return await this.commentsService.removeComment(id);
   }
 
   @Query(() => Comment)
-  async getOneUser(@Args('id') id: string): Promise<Comment> {
+  async getOneUser(@Args('id') id: number): Promise<Comment> {
     return await this.commentsService.getOneComment(id);
   }
 }

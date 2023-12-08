@@ -16,11 +16,11 @@ export class ChaptersService {
     return await this.chapterRepository.save({ ...chapterCreate });
   }
 
-  async getOneChapter(id: string): Promise<Chapter> {
+  async getOneChapter(id: number): Promise<Chapter> {
     return await this.chapterRepository.findOneBy({ id });
   }
 
-  async removeChapter(id: string): Promise<string> {
+  async removeChapter(id: number): Promise<number> {
     await this.chapterRepository.delete({ id });
     return id;
   }

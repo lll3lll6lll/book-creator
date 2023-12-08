@@ -25,12 +25,12 @@ export class ChaptersResolver {
   }
 
   @Mutation(() => Number)
-  async removeChapter(@Args('id') id: string): Promise<string> {
+  async removeChapter(@Args('id') id: number): Promise<number> {
     return await this.chaptersService.removeChapter(id);
   }
 
   @Query(() => Chapter)
-  async getOneChapter(@Args('id') id: string): Promise<Chapter> {
+  async getOneChapter(@Args('id') id: number): Promise<Chapter> {
     return await this.chaptersService.getOneChapter(id);
   }
 }

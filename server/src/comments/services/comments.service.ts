@@ -16,11 +16,11 @@ export class CommentsService {
     return await this.commentRepository.save({ ...commentCreate });
   }
 
-  async getOneComment(id: string): Promise<Comment> {
+  async getOneComment(id: number): Promise<Comment> {
     return await this.commentRepository.findOneBy({ id });
   }
 
-  async removeComment(id: string): Promise<string> {
+  async removeComment(id: number): Promise<number> {
     await this.commentRepository.delete({ id });
     return id;
   }

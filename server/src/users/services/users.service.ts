@@ -16,11 +16,11 @@ export class UsersService {
     return await this.userRepository.save({ ...userCreate });
   }
 
-  async getOneUser(id: string): Promise<User> {
+  async getOneUser(id: number): Promise<User> {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async removeUser(id: string): Promise<string> {
+  async removeUser(id: number): Promise<number> {
     await this.userRepository.delete({ id });
     return id;
   }
