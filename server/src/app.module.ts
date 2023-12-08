@@ -8,8 +8,9 @@ import { dbConfig } from '@src/db/config';
 import { BooksModule } from './books/books.module';
 import { CommentsModule } from './comments/comments.module';
 import { AppContextModule } from '@src/app-context/module';
-import { AppInterceptor } from '@src/app.interceptor';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+// import { AppInterceptor } from '@src/app.interceptor';
+// import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ChaptersModule } from './chapter/chapters.module';
 
 @Module({
   imports: [
@@ -25,8 +26,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     BooksModule,
     CommentsModule,
     AppContextModule,
+    ChaptersModule,
   ],
   controllers: [],
-  providers: [{ provide: APP_INTERCEPTOR, useClass: AppInterceptor }],
+  // providers: [{ provide: APP_INTERCEPTOR, useClass: AppInterceptor }],
 })
 export class AppModule {}

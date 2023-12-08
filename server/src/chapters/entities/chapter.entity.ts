@@ -4,20 +4,20 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 @Entity()
 @ObjectType()
-export class Comment extends BaseEntity {
+export class Chapter extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Field()
   @Column()
-  text: string;
-
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  parents?: string;
+  title: string;
 
   @Field()
   @Column()
-  entityId: string;
+  order: number;
+
+  @Field()
+  @Column()
+  bookId: string;
 }

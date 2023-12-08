@@ -7,4 +7,7 @@ export class CommentCreate {
 
   @Field({ nullable: true })
   parents: string;
+
+  @Field()
+  entityId: string;
 }
