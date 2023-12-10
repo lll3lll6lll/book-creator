@@ -6,5 +6,5 @@ export class BookCreate {
   title: string;
 
   @Field()
-  ownerId: string;
+  ownerId: number;
 }

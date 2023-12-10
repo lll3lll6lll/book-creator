@@ -18,6 +18,7 @@ export const dbConfig: PostgresConnectionOptions = {
   schema: process.env.DATABASE_SCHEMA,
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
+
   ssl:
     process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
   poolSize: process.env.DATABASE_POOL_SIZE

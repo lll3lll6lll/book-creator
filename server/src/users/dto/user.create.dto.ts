@@ -6,5 +6,8 @@ export class UserCreate {
   email: string;
 
   @Field({ nullable: true })
-  name: string;
+  first_name: string;
+
+  @Field({ nullable: true })
+  last_name: string;
 }

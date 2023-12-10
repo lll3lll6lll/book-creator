@@ -12,5 +12,5 @@ export class ChapterUpdate {
   order?: number;
 
   @Field()
-  bookId?: string;
+  book_id?: number;
 }

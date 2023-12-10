@@ -1,5 +1,5 @@
 import { BaseEntity } from '@src/db/base-entity/base.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 @Entity()
@@ -13,7 +13,8 @@ export class Book extends BaseEntity {
   @Column()
   title: string;
 
+  @Index()
   @Field({ nullable: true })
   @Column({ nullable: true })
-  ownerId: string;
+  ownerId: number;
 }

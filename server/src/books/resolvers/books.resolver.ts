@@ -25,12 +25,12 @@ export class BooksResolver {
   }
 
   @Mutation(() => Number)
-  async removeBook(@Args('id') id: string): Promise<string> {
+  async removeBook(@Args('id') id: number): Promise<number> {
     return await this.bookService.removeBook(id);
   }
 
   @Query(() => Book)
-  async getOneBook(@Args('id') id: string): Promise<Book> {
+  async getOneBook(@Args('id') id: number): Promise<Book> {
     return await this.bookService.getOneBook(id);
   }
 }

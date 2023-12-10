@@ -9,5 +9,5 @@ export class ChapterCreate {
   order: number;
 
   @Field()
-  bookId: string;
+  book_id: number;
 }
