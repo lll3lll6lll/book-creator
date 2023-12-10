@@ -7,7 +7,4 @@ export class CommentUpdate {
 
   @Field()
   text: string;
-
-  @Field({ nullable: true })
-  parents?: string;
 }

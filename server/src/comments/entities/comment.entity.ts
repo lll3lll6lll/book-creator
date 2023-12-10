@@ -14,11 +14,16 @@ export class Comment extends BaseEntity {
   text: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true })
-  parents?: number[];
+  @Column({ nullable: true, type: 'simple-array' })
+  parents: number[];
 
   @Index()
   @Field()
   @Column()
-  entity_id: number;
+  book_id: number;
+
+  @Index()
+  @Field()
+  @Column()
+  chapter_id: number;
 }

@@ -9,5 +9,8 @@ export class CommentCreate {
   parents: number[];
 
   @Field()
-  entity_id: number;
+  book_id: number;
+
+  @Field()
+  chapter_id: number;
 }
