@@ -2,44 +2,69 @@ import { faker } from '@faker-js/faker';
 import { DataSource, EntityManager } from 'typeorm';
 import { Comment } from '@src/comments/entities/comment.entity';
 import { CommentCreate } from '@src/comments/dto/comment.create.dto';
+import { Repository } from 'typeorm/repository/Repository';
+import { CommentUpdate } from '@src/comments/dto/comment.update.dto';
 
-export function genFakeComment(params: Partial<Comment> = {}): Comment {
-  const comment = new Comment();
-
-  comment.id = +faker.string.numeric(7);
-  comment.text = faker.lorem.sentences(4);
-  comment.book_id = +faker.string.numeric(7);
-  comment.chapter_id = +faker.string.numeric(7);
-  comment.parents = null;
-
-  Object.assign(comment, params);
-
-  return comment;
+interface Dependencies {
+  book_id: number;
+  chapter_id: number;
+  parent_id?: number;
 }
+export class CommentsTestFabric {
+  private depends: Dependencies;
+  private comments: Comment[] = [];
+  private rep: Repository<Comment>;
+  constructor(client: DataSource | EntityManager) {
+    this.rep = client.getRepository(Comment);
+  }
 
-export function genFakeCommentCreate(
-  params: Partial<CommentCreate> = {},
-): CommentCreate {
-  const comment = {
-    text: faker.lorem.sentences(4),
-    parent_id: +faker.string.numeric(7),
-    book_id: +faker.string.numeric(7),
-    chapter_id: +faker.string.numeric(7),
-  };
-  Object.assign(comment, params);
-  return comment;
-}
+  setDependencies(dep: Dependencies) {
+    if (!this.depends) this.depends = dep;
+    else Object.assign(this.depends, dep);
+    this.depends.parent_id = dep.parent_id || null;
+  }
 
-export async function saveFakeComment(
-  client: DataSource | EntityManager,
-  obj: Partial<Comment> = {},
-): Promise<Comment> {
-  return client.getRepository(Comment).save(obj);
-}
+  async getOneWithParent(
+    parent_id: number | null = this.depends.parent_id,
+  ): Promise<Comment> {
+    if (!this.depends.book_id || !this.depends.chapter_id) {
+      throw Error(
+        ' Set dependencies (external key) to create entity of comment ',
+      );
+    }
 
-export async function removeFakeComments(
-  client: DataSource | EntityManager,
-  ids: number[],
-): Promise<void> {
-  await client.getRepository(Comment).delete(ids);
+    const obj: CommentCreate = {
+      text: faker.lorem.sentence(3),
+      book_id: this.depends.book_id,
+      chapter_id: this.depends.chapter_id,
+      parent_id: parent_id || this.depends.parent_id || null,
+    };
+
+    const comment = await this.rep.save(obj);
+    this.comments.push(comment);
+    return comment;
+  }
+
+  async getOne() {
+    return this.getOneWithParent();
+  }
+
+  getUpdates(): Omit<Required<CommentUpdate>, 'id'> {
+    return {
+      text: faker.lorem.sentence(3),
+    };
+  }
+
+  getCreates(params: Partial<CommentCreate> = {}): CommentCreate {
+    return {
+      text: faker.lorem.sentence(3),
+      ...this.depends,
+      ...params,
+    };
+  }
+
+  async clean() {
+    await this.rep.delete(this.comments.map((i) => i.id));
+    this.comments = [];
+  }
 }

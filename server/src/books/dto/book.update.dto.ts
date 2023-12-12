@@ -7,7 +7,4 @@ export class BookUpdate {
 
   @Field()
   title?: string;
-
-  @Field()
-  ownerId?: number;
 }

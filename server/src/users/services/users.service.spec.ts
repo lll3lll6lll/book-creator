@@ -1,12 +1,14 @@
 import { UsersService } from './users.service';
 import { initTestNest } from '@test/utils/test.utils';
 import { INestApplication } from '@nestjs/common';
-import { genFakeUser } from '@test/generators/users.fake';
-import { faker } from '@faker-js/faker';
+import { UsersTestFabric } from '@test/generators/users.fake';
 import { UsersModule } from '@src/users/users.module';
+import { DataSource } from 'typeorm';
 
 let nestApp: INestApplication;
 let service: UsersService;
+let client: DataSource;
+
 describe('UsersService', () => {
   beforeAll(async () => {
     const { module, app } = await initTestNest({
@@ -15,6 +17,7 @@ describe('UsersService', () => {
 
     nestApp = app;
     service = module.get<UsersService>(UsersService);
+    client = module.get(DataSource);
   });
 
   afterAll(async () => await nestApp.close());
@@ -24,15 +27,14 @@ describe('UsersService', () => {
   });
 
   it('Users: CRUD', async () => {
-    const fake = genFakeUser();
-    const user = await service.createUser(fake);
+    const usersFabric = new UsersTestFabric(client);
+    const user = await service.createUser(usersFabric.getCreates());
 
     const actual1 = await service.getOneUser(user.id);
     expect(actual1).toEqual(user);
 
-    user.email = faker.internet.email();
-    user.first_name = faker.person.firstName();
-    user.last_name = faker.person.lastName();
+    const updates = usersFabric.getUpdates();
+    Object.assign(user, updates);
 
     await service.updateUser(user);
     const actual2 = await service.getOneUser(user.id);

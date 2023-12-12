@@ -2,13 +2,8 @@ import { CommentsService } from './comments.service';
 import { initTestNest } from '@test/utils/test.utils';
 import { INestApplication } from '@nestjs/common';
 import { CommentsModule } from '@src/comments/comments.module';
-import { faker } from '@faker-js/faker';
-import {
-  genFakeComment,
-  genFakeCommentCreate,
-  removeFakeComments,
-} from '@test/generators/comment.fake';
 import { DataSource } from 'typeorm';
+import { TestEntitiesFabric } from '@test/generators/TestEntitiesFabric';
 
 let nestApp: INestApplication;
 let service: CommentsService;
@@ -31,13 +26,17 @@ describe('CommentsService', () => {
   });
 
   it('Comment: CRUD', async () => {
-    const fake = genFakeComment();
-    const comment = await service.createComment(fake);
+    const fabric = new TestEntitiesFabric(client);
+    await fabric.createSet();
+
+    const creates = fabric.comments.getCreates();
+    const comment = await service.createComment(creates);
 
     const actual1 = await service.getOneComment(comment.id);
     expect(actual1).toEqual(comment);
 
-    comment.text = faker.lorem.sentences(7);
+    const updates = fabric.comments.getUpdates();
+    Object.assign(comment, updates);
 
     await service.updateComment(comment);
     const actual2 = await service.getOneComment(comment.id);
@@ -46,21 +45,26 @@ describe('CommentsService', () => {
     await service.removeComment(comment.id);
     const actual3 = await service.getOneComment(comment.id);
     expect(actual3).toBeNull();
+
+    await fabric.clean();
   });
 
   it('Comment: create child comment', async () => {
-    const com1 = genFakeCommentCreate({ parent_id: null });
-    const c1 = await service.createComment(com1);
+    const fabric = new TestEntitiesFabric(client);
+    await fabric.createSet();
+
+    const creates = fabric.comments.getCreates();
+    const c1 = await service.createComment(creates);
     expect(c1.parents).toBeNull();
 
-    const com2 = genFakeCommentCreate({ parent_id: c1.id });
-    const c2 = await service.createComment(com2);
+    const creates2 = fabric.comments.getCreates({ parent_id: c1.id });
+    const c2 = await service.createComment(creates2);
     expect(c2.parents).toEqual([c1.id]);
 
-    const com3 = genFakeCommentCreate({ parent_id: c2.id });
-    const c3 = await service.createComment(com3);
+    const creates3 = fabric.comments.getCreates({ parent_id: c2.id });
+    const c3 = await service.createComment(creates3);
     expect(c3.parents).toEqual([c1.id, c2.id]);
 
-    await removeFakeComments(client, [c1.id, c2.id, c3.id]);
+    await fabric.clean();
   });
 });

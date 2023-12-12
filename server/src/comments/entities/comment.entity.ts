@@ -14,7 +14,7 @@ export class Comment extends BaseEntity {
   text: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true, type: 'simple-array' })
+  @Column({ nullable: true, type: 'int', array: true })
   parents: number[];
 
   @Index()

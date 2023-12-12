@@ -2,11 +2,13 @@ import { ChaptersService } from './chapters.service';
 import { initTestNest } from '@test/utils/test.utils';
 import { INestApplication } from '@nestjs/common';
 import { ChaptersModule } from '@src/chapters/chapters.module';
-import { faker } from '@faker-js/faker';
-import { genFakeChapter } from '@test/generators/chapters.fake';
+import { DataSource } from 'typeorm';
+import { TestEntitiesFabric } from '@test/generators/TestEntitiesFabric';
 
 let nestApp: INestApplication;
 let service: ChaptersService;
+let client: DataSource;
+
 describe('ChapterService', () => {
   beforeAll(async () => {
     const { module, app } = await initTestNest({
@@ -15,6 +17,7 @@ describe('ChapterService', () => {
 
     nestApp = app;
     service = module.get<ChaptersService>(ChaptersService);
+    client = module.get(DataSource);
   });
 
   afterAll(async () => await nestApp.close());
@@ -24,14 +27,17 @@ describe('ChapterService', () => {
   });
 
   it('Chapters: CRUD', async () => {
-    const fake = genFakeChapter();
-    const chapter = await service.createChapter(fake);
+    const fabric = new TestEntitiesFabric(client);
+    await fabric.createSet();
+
+    const creates = fabric.chapters.getCreates();
+    const chapter = await service.createChapter(creates);
 
     const actual1 = await service.getOneChapter(chapter.id);
     expect(actual1).toEqual(chapter);
 
-    chapter.title = faker.lorem.sentence(3);
-    chapter.order = chapter.order++;
+    const updates = fabric.chapters.getUpdates();
+    Object.assign(chapter, updates);
 
     await service.updateChapter(chapter);
     const actual2 = await service.getOneChapter(chapter.id);
@@ -40,5 +46,7 @@ describe('ChapterService', () => {
     await service.removeChapter(chapter.id);
     const actual3 = await service.getOneChapter(chapter.id);
     expect(actual3).toBeNull();
+
+    await fabric.clean();
   });
 });
