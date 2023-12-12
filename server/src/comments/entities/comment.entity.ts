@@ -26,4 +26,8 @@ export class Comment extends BaseEntity {
   @Field()
   @Column()
   chapter_id: number;
+
+  @Field()
+  @Column({ type: 'boolean', default: false })
+  deleted: false;
 }

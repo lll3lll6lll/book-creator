@@ -12,8 +12,19 @@ export class CommentsService {
     private readonly commentRepository: Repository<Comment>,
   ) {}
 
-  async createComment(commentCreate: CommentCreate): Promise<Comment> {
-    return await this.commentRepository.save({ ...commentCreate });
+  async createComment(createParam: CommentCreate): Promise<Comment> {
+    const { parent_id, ...param } = createParam;
+    const parents = [];
+    if (parent_id) {
+      const parentComment = await this.getOneComment(parent_id);
+      parentComment.parents && parents.push(...parentComment.parents);
+      parents.push(parent_id);
+    }
+
+    return await this.commentRepository.save({
+      ...param,
+      parents: parents.length ? parents : null,
+    });
   }
 
   async getOneComment(id: number): Promise<Comment> {

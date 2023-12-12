@@ -6,7 +6,7 @@ export class CommentCreate {
   text: string;
 
   @Field({ nullable: true })
-  parents: number[];
+  parent_id?: number;
 
   @Field()
   book_id: number;
