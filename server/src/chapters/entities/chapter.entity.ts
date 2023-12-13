@@ -4,10 +4,12 @@ import {
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Book } from '@src/books/entities/book.entity';
+import { Comment } from '@src/comments/entities/comment.entity';
 
 @Entity()
 @ObjectType()
@@ -29,6 +31,11 @@ export class Chapter extends BaseEntity {
   @Column()
   book_id: number;
 
+  @Field()
   @ManyToOne(() => Book, (book) => book.chapters, { onDelete: 'CASCADE' })
   book: Book;
+
+  @Field()
+  @OneToMany(() => Comment, (comment) => comment.chapter)
+  comments: Comment[];
 }

@@ -34,7 +34,7 @@ export class TestEntitiesFabric {
     await Promise.all([
       this.users.clean(),
       this.books.clean(),
-      this.comments.clean(),
+      this.chapters.clean(),
       this.comments.clean(),
     ]);
   }

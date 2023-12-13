@@ -1,16 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { UsersResolver } from '@src/users/resolvers/users.resolver';
+import { INestApplication } from '@nestjs/common';
+import { initTestNest } from '@test/utils/test.utils';
+import { UsersModule } from '@src/users/users.module';
 
+let nestApp: INestApplication;
+let resolver: UsersResolver;
 describe('UsersResolver', () => {
-  let resolver: UsersResolver;
+  beforeAll(async () => {
+    const { module, app } = await initTestNest({
+      imports: [UsersModule],
+    });
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersResolver],
-    }).compile();
-
+    nestApp = app;
     resolver = module.get<UsersResolver>(UsersResolver);
   });
+
+  afterAll(async () => await nestApp.close());
 
   it('should be defined', () => {
     expect(resolver).toBeDefined();
