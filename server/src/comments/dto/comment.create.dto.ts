@@ -11,6 +11,6 @@ export class CommentCreate {
   @Field()
   book_id: number;
 
-  @Field()
-  chapter_id: number;
+  @Field({ nullable: true })
+  chapter_id?: number;
 }

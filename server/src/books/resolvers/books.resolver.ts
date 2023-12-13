@@ -1,12 +1,27 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { BooksService } from '../services/books.service';
 import { BookCreate } from '../dto/book.create.dto';
 import { Book } from '../entities/book.entity';
 import { BookUpdate } from '../dto/book.update.dto';
+import { Chapter } from '@src/chapters/entities/chapter.entity';
+import { ChaptersService } from '@src/chapters/services/chapters.service';
+import { Comment } from '@src/comments/entities/comment.entity';
+import { CommentsService } from '@src/comments/services/comments.service';
 
-@Resolver()
+@Resolver(() => Book)
 export class BooksResolver {
-  constructor(private readonly bookService: BooksService) {}
+  constructor(
+    private readonly bookService: BooksService,
+    private readonly chaptersService: ChaptersService,
+    private readonly commentsService: CommentsService,
+  ) {}
 
   @Mutation(() => Book)
   async createBook(
@@ -32,5 +47,17 @@ export class BooksResolver {
   @Query(() => Book)
   async getOneBook(@Args('id') id: number): Promise<Book> {
     return await this.bookService.getOneBook(id);
+  }
+
+  @ResolveField('chapters', () => [Chapter])
+  async getChapters(@Parent() book: Book) {
+    const { id } = book;
+    return this.chaptersService.getChaptersOfBook(id);
+  }
+
+  @ResolveField('comments', () => [Comment])
+  async getComments(@Parent() book: Book) {
+    const { id } = book;
+    return this.commentsService.getCommentsForBook(id);
   }
 }

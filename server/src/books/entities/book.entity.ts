@@ -22,15 +22,15 @@ export class Book extends BaseEntity {
   title: string;
 
   @Index()
-  @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Field()
+  @Column()
   owner_id: number;
 
-  @Field()
+  @Field(() => [Chapter], { nullable: true })
   @OneToMany(() => Chapter, (chapter) => chapter.book)
   chapters: Chapter[];
 
-  @Field()
+  @Field(() => [Comment], { nullable: true })
   @OneToMany(() => Comment, (comment) => comment.book)
   comments: Comment[];
 }

@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import { Book } from '@src/books/entities/book.entity';
 import { Chapter } from '@src/chapters/entities/chapter.entity';
 
@@ -21,7 +21,7 @@ export class Comment extends BaseEntity {
   @Column()
   text: string;
 
-  @Field({ nullable: true })
+  @Field(() => [Int], { nullable: true })
   @Column({ nullable: true, type: 'int', array: true })
   parents: number[];
 
@@ -31,21 +31,21 @@ export class Comment extends BaseEntity {
   book_id: number;
 
   @Index()
-  @Field()
-  @Column()
+  @Field(() => Int, { nullable: true })
+  @Column({ nullable: true })
   chapter_id: number;
 
   @Field()
   @Column({ type: 'boolean', default: false })
   deleted: false;
 
-  @Field()
+  @Field(() => Book)
   @ManyToOne(() => Book, (book) => book.comments, { onDelete: 'CASCADE' })
   book: Book;
 
-  @Field()
+  @Field(() => Chapter)
   @ManyToOne(() => Chapter, (chapter) => chapter.comments, {
     onDelete: 'CASCADE',
   })
-  chapter: Book;
+  chapter: Chapter;
 }

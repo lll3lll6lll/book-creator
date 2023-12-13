@@ -32,4 +32,8 @@ export class ChaptersService {
     );
     return await this.getOneChapter(chapterUpdate.id);
   }
+
+  async getChaptersOfBook(book_id: number): Promise<Chapter[]> {
+    return await this.chapterRepository.findBy({ book_id });
+  }
 }

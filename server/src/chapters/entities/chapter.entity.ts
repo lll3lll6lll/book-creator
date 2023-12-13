@@ -31,11 +31,11 @@ export class Chapter extends BaseEntity {
   @Column()
   book_id: number;
 
-  @Field()
+  @Field(() => Book)
   @ManyToOne(() => Book, (book) => book.chapters, { onDelete: 'CASCADE' })
   book: Book;
 
-  @Field()
+  @Field(() => [Comment], { nullable: true })
   @OneToMany(() => Comment, (comment) => comment.chapter)
   comments: Comment[];
 }
