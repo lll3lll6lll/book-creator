@@ -53,7 +53,7 @@ export class ChaptersResolver {
   async getChaptersOfBook(
     @Args('book_id') book_id: number,
   ): Promise<Chapter[]> {
-    return await this.chaptersService.getChaptersOfBook(book_id);
+    return await this.chaptersService.getBookChapters(book_id);
   }
 
   @ResolveField('book', () => Book)

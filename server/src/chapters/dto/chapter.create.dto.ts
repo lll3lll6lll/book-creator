@@ -6,8 +6,5 @@ export class ChapterCreate {
   title: string;
 
   @Field()
-  order: number;
-
-  @Field()
   book_id: number;
 }

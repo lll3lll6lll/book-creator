@@ -49,4 +49,24 @@ describe('ChapterService', () => {
 
     await fabric.clean();
   });
+
+  it('Chapters: check order', async () => {
+    const fabric = new TestEntitiesFabric(client);
+    await fabric.createSet();
+    const book = await fabric.books.getOne();
+
+    const ch1 = await service.createChapter({
+      ...fabric.chapters.getCreates(),
+      book_id: book.id,
+    });
+    expect(ch1.order).toEqual(1);
+
+    const ch2 = await service.createChapter({
+      ...fabric.chapters.getCreates(),
+      book_id: book.id,
+    });
+    expect(ch2.order).toEqual(2);
+
+    await fabric.clean();
+  });
 });

@@ -17,17 +17,20 @@ export class ChaptersTestFabric {
     this.book_id = dep.book_id;
   }
 
-  async getOne(): Promise<Chapter> {
+  async getOne(
+    param: { book_id?: number; user_id?: number } = {},
+  ): Promise<Chapter> {
     if (!this.book_id) {
       throw Error(
         ' Set dependencies (external key) to create entity of chapter ',
       );
     }
 
-    const obj: ChapterCreate = {
+    const obj = {
       book_id: this.book_id,
       order: 1,
       title: faker.lorem.sentence(3),
+      ...param,
     };
     const chapter = await this.rep.save(obj);
     this.chapters.push(chapter);
@@ -45,7 +48,6 @@ export class ChaptersTestFabric {
   getCreates(): Required<ChapterCreate> {
     return {
       title: faker.lorem.sentence(3),
-      order: 7,
       book_id: this.book_id,
     };
   }

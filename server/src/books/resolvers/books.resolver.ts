@@ -52,7 +52,7 @@ export class BooksResolver {
   @ResolveField('chapters', () => [Chapter])
   async getChapters(@Parent() book: Book) {
     const { id } = book;
-    return this.chaptersService.getChaptersOfBook(id);
+    return this.chaptersService.getBookChapters(id);
   }
 
   @ResolveField('comments', () => [Comment])

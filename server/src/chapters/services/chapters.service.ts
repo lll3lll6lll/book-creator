@@ -13,7 +13,13 @@ export class ChaptersService {
   ) {}
 
   async createChapter(chapterCreate: ChapterCreate): Promise<Chapter> {
-    return await this.chapterRepository.save({ ...chapterCreate });
+    const lastOrder = await this.chapterRepository.maximum('order', {
+      book_id: chapterCreate.book_id,
+    });
+    return await this.chapterRepository.save({
+      ...chapterCreate,
+      order: (lastOrder || 0) + 1,
+    });
   }
 
   async getOneChapter(id: number): Promise<Chapter> {
@@ -33,7 +39,10 @@ export class ChaptersService {
     return await this.getOneChapter(chapterUpdate.id);
   }
 
-  async getChaptersOfBook(book_id: number): Promise<Chapter[]> {
-    return await this.chapterRepository.findBy({ book_id });
+  async getBookChapters(book_id: number): Promise<Chapter[]> {
+    return await this.chapterRepository.find({
+      where: { book_id },
+      order: { order: 'ASC' },
+    });
   }
 }
