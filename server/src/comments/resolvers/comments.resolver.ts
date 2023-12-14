@@ -49,6 +49,18 @@ export class CommentsResolver {
     return await this.commentsService.getOneComment(id);
   }
 
+  @Query(() => [Comment])
+  async getChapterComments(
+    @Args('chapter_id') chapter_id: number,
+  ): Promise<Comment> {
+    return await this.commentsService.getOneComment(chapter_id);
+  }
+
+  @Query(() => [Comment])
+  async getBookComments(@Args('book_id') book_id: number): Promise<Comment[]> {
+    return await this.commentsService.getBookComments(book_id);
+  }
+
   @ResolveField('book', () => Book)
   async getBook(@Parent() comment: Comment) {
     const { book_id } = comment;

@@ -44,11 +44,11 @@ export class CommentsService {
     return await this.getOneComment(commentUpdate.id);
   }
 
-  async getCommentsForBook(book_id: number): Promise<Comment[]> {
+  async getBookComments(book_id: number): Promise<Comment[]> {
     return await this.commentRepository.findBy({ book_id, chapter_id: null });
   }
 
-  async getCommentsForChapter(chapter_id: number): Promise<Comment[]> {
+  async getChapterComments(chapter_id: number): Promise<Comment[]> {
     return await this.commentRepository.findBy({ chapter_id });
   }
 }

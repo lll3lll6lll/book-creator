@@ -50,9 +50,7 @@ export class ChaptersResolver {
   }
 
   @Query(() => [Chapter])
-  async getChaptersOfBook(
-    @Args('book_id') book_id: number,
-  ): Promise<Chapter[]> {
+  async getBookChapters(@Args('book_id') book_id: number): Promise<Chapter[]> {
     return await this.chaptersService.getBookChapters(book_id);
   }
 
@@ -65,6 +63,6 @@ export class ChaptersResolver {
   @ResolveField('comments', () => [Comment])
   async getComments(@Parent() chapter: Chapter) {
     const { id } = chapter;
-    return this.commentsService.getCommentsForChapter(id);
+    return this.commentsService.getChapterComments(id);
   }
 }

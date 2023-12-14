@@ -58,6 +58,6 @@ export class BooksResolver {
   @ResolveField('comments', () => [Comment])
   async getComments(@Parent() book: Book) {
     const { id } = book;
-    return this.commentsService.getCommentsForBook(id);
+    return this.commentsService.getBookComments(id);
   }
 }
