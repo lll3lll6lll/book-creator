@@ -6,6 +6,7 @@ import GraphQLJSON from 'graphql-type-json';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { dbConfig } from '@src/db/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 export function initGqlTestNest({
   imports = [],
@@ -37,6 +38,7 @@ export async function initTestNest({
     imports: [
       TypeOrmModule.forRoot(dbConfig),
       ConfigModule.forRoot({ isGlobal: true }),
+      EventEmitterModule.forRoot(),
       ...imports,
     ],
     providers: [...providers],

@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CommentCreate } from '@src/comments/dto/comment.create.dto';
 import { Comment } from '@src/comments/entities/comment.entity';
 import { CommentUpdate } from '@src/comments/dto/comment.update.dto';
+// import { CommentCreatedEvent } from '@src/comments/events/comment-created.event';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createComment(createParam: CommentCreate): Promise<Comment> {
@@ -21,10 +24,16 @@ export class CommentsService {
       parents.push(parent_id);
     }
 
-    return await this.commentRepository.save({
+    const res = await this.commentRepository.save({
       ...param,
       parents: parents.length ? parents : null,
     });
+
+    // const commentCreated = new CommentCreatedEvent();
+    // commentCreated.comment = res;
+    this.eventEmitter.emit('comment.created', { comment: res });
+
+    return res;
   }
 
   async getOneComment(id: number): Promise<Comment> {
