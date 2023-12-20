@@ -10,6 +10,8 @@ import { CommentsModule } from '@src/comments/comments.module';
 import { AppContextModule } from '@src/app-context/module';
 import { ChaptersModule } from '@src/chapters/chapters.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AuthModule } from '@src/auth/auth.module';
+import { TokenModule } from '@src/auth/auth-token/token.module';
 // import { AppInterceptor } from '@src/app.interceptor';
 // import { APP_INTERCEPTOR } from '@nestjs/core';
 
@@ -20,10 +22,19 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     EventEmitterModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: true,
-      playground: true,
+      // autoSchemaFile: true,
+      autoSchemaFile: 'schema.gql',
       introspection: true,
+      // playground: true,
+      playground: {
+        settings: {
+          'request.credentials': 'include', // Otherwise cookies won't be sent
+        },
+      },
+      context: ({ req, res }) => ({ req, res }),
     }),
+    AuthModule,
+    TokenModule,
     UsersModule,
     BooksModule,
     CommentsModule,

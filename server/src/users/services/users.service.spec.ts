@@ -30,18 +30,18 @@ describe('UsersService', () => {
     const usersFabric = new UsersTestFabric(client);
     const user = await service.createUser(usersFabric.getCreates());
 
-    const actual1 = await service.getOneUser(user.id);
+    const actual1 = await service.getById(user.id);
     expect(actual1).toEqual(user);
 
     const updates = usersFabric.getUpdates();
     Object.assign(user, updates);
 
-    await service.updateUser(user);
-    const actual2 = await service.getOneUser(user.id);
+    await service.update(user);
+    const actual2 = await service.getById(user.id);
     expect(actual2).toEqual(user);
 
-    await service.removeUser(user.id);
-    const actual3 = await service.getOneUser(user.id);
+    await service.remove(user.id);
+    const actual3 = await service.getById(user.id);
     expect(actual3).toBeNull();
   });
 });

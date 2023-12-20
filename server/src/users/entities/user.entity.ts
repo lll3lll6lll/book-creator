@@ -10,14 +10,25 @@ export class User extends BaseEntity {
   id: number;
 
   @Field()
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  first_name: string;
+  first_name?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  last_name: string;
+  last_name?: string;
+
+  @Field({ nullable: true })
+  @Column({ select: false })
+  password: string;
+
+  @Field()
+  @Column({ default: false })
+  is_activated?: boolean;
+
+  @Column({ nullable: true, select: false })
+  activation_link?: string;
 }

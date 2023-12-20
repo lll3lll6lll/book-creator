@@ -21,16 +21,16 @@ export class UsersResolver {
     @Args({ name: 'dto', type: () => UserUpdate })
     userUpdate: UserUpdate,
   ): Promise<User> {
-    return await this.userService.updateUser(userUpdate);
+    return await this.userService.update(userUpdate);
   }
 
   @Mutation(() => Number)
   async removeUser(@Args('id') id: number): Promise<number> {
-    return await this.userService.removeUser(id);
+    return await this.userService.remove(id);
   }
 
   @Query(() => User)
   async getOneUser(@Args('id') id: number): Promise<User> {
-    return await this.userService.getOneUser(id);
+    return await this.userService.getById(id);
   }
 }
