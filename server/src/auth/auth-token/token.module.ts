@@ -5,13 +5,7 @@ import { AuthToken } from '@src/auth/auth-token/entities/auth-token.entity';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([AuthToken]),
-    JwtModule.register({
-      secret: 'sssss -ddd', //jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([AuthToken]), JwtModule],
   providers: [AuthTokenService],
   exports: [AuthTokenService],
 })

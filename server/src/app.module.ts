@@ -7,13 +7,13 @@ import { UsersModule } from '@src/users/users.module';
 import { dbConfig } from '@src/db/config';
 import { BooksModule } from '@src/books/books.module';
 import { CommentsModule } from '@src/comments/comments.module';
-import { AppContextModule } from '@src/app-context/module';
+import { AppContextModule } from '@src/shared/app-context/module';
 import { ChaptersModule } from '@src/chapters/chapters.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthModule } from '@src/auth/auth.module';
 import { TokenModule } from '@src/auth/auth-token/token.module';
-// import { AppInterceptor } from '@src/app.interceptor';
-// import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AppInterceptor } from '@src/app.interceptor';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -42,6 +42,6 @@ import { TokenModule } from '@src/auth/auth-token/token.module';
     ChaptersModule,
   ],
   controllers: [],
-  // providers: [{ provide: APP_INTERCEPTOR, useClass: AppInterceptor }],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: AppInterceptor }],
 })
 export class AppModule {}

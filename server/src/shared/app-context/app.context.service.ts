@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { AppContext } from './app.context.dto';
 import { plainToInstance } from 'class-transformer';
 import { XHeader } from './types';
+import { CookieDto } from '@src/shared/app-context/cookie.dto';
 
 interface StorageType {
   appContext: AppContext;
@@ -10,9 +11,8 @@ interface StorageType {
 }
 
 const headerMap: { [K in XHeader]: keyof AppContext } = {
-  'x-user-id': 'userId',
-  'x-session-id': 'sessionId',
-  'x-request-id': 'requestId',
+  'user-agent': 'userAgent',
+  authorization: 'authorization',
   cookie: 'cookie',
 };
 @Injectable()
@@ -38,13 +38,29 @@ export class AppContextService {
       const value = headers[key];
       key = key.toLowerCase();
       if (!headerMap[key] || !value) continue;
+
+      if (key === 'cookie') {
+        context.cookie = this.parseCookies(value);
+        continue;
+      }
       context[headerMap[key]] = value;
     }
 
     return this.setContext(context);
   }
+
   getContext(): AppContext {
     return this.storage.getStore()?.appContext || new AppContext();
+  }
+
+  private parseCookies(cookie: string): CookieDto {
+    return cookie
+      .split(';')
+      .map((i) => i.split('='))
+      .reduce((acc, entry) => {
+        acc[entry[0]] = entry[1];
+        return acc;
+      }, {});
   }
 }
 
