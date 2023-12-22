@@ -15,11 +15,11 @@ export class CommentsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  async createComment(createParam: CommentCreate): Promise<Comment> {
+  async create(createParam: CommentCreate): Promise<Comment> {
     const { parent_id, ...param } = createParam;
     const parents = [];
     if (parent_id) {
-      const parentComment = await this.getOneComment(parent_id);
+      const parentComment = await this.getById(parent_id);
       parentComment.parents && parents.push(...parentComment.parents);
       parents.push(parent_id);
     }
@@ -36,21 +36,21 @@ export class CommentsService {
     return res;
   }
 
-  async getOneComment(id: number): Promise<Comment> {
+  async getById(id: number): Promise<Comment> {
     return await this.commentRepository.findOneBy({ id });
   }
 
-  async removeComment(id: number): Promise<number> {
+  async remove(id: number): Promise<number> {
     await this.commentRepository.delete({ id });
     return id;
   }
 
-  async updateComment(commentUpdate: CommentUpdate): Promise<Comment> {
+  async update(commentUpdate: CommentUpdate): Promise<Comment> {
     await this.commentRepository.update(
       { id: commentUpdate.id },
       { ...commentUpdate },
     );
-    return await this.getOneComment(commentUpdate.id);
+    return await this.getById(commentUpdate.id);
   }
 
   async getBookComments(book_id: number): Promise<Comment[]> {

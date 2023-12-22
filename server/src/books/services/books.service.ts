@@ -12,20 +12,20 @@ export class BooksService {
     private readonly bookRepository: Repository<Book>,
   ) {}
 
-  async createBook(bookCreate: BookCreate): Promise<Book> {
+  async create(bookCreate: BookCreate): Promise<Book> {
     return await this.bookRepository.save({ ...bookCreate });
   }
 
-  async getOneBook(id: number): Promise<Book> {
+  async getById(id: number): Promise<Book> {
     return await this.bookRepository.findOneBy({ id });
   }
 
-  async updateBook(bookUpdate: BookUpdate): Promise<Book> {
+  async update(bookUpdate: BookUpdate): Promise<Book> {
     await this.bookRepository.update({ id: bookUpdate.id }, { ...bookUpdate });
-    return await this.getOneBook(bookUpdate.id);
+    return await this.getById(bookUpdate.id);
   }
 
-  async removeBook(id: number): Promise<number> {
+  async remove(id: number): Promise<number> {
     await this.bookRepository.delete({ id });
     return id;
   }

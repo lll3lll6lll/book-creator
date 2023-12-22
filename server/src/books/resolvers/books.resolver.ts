@@ -29,7 +29,7 @@ export class BooksResolver {
     @Args({ name: 'dto', type: () => BookCreate })
     bookCreate: BookCreate,
   ): Promise<Book> {
-    return await this.bookService.createBook(bookCreate);
+    return await this.bookService.create(bookCreate);
   }
 
   @Mutation(() => Book)
@@ -37,18 +37,18 @@ export class BooksResolver {
     @Args({ name: 'dto', type: () => BookUpdate })
     bookUpdate: BookUpdate,
   ): Promise<Book> {
-    return await this.bookService.updateBook(bookUpdate);
+    return await this.bookService.update(bookUpdate);
   }
 
   @Mutation(() => Number)
   async removeBook(@Args('id') id: number): Promise<number> {
-    return await this.bookService.removeBook(id);
+    return await this.bookService.remove(id);
   }
 
   @Public()
   @Query(() => Book)
   async getOneBook(@Args('id') id: number): Promise<Book> {
-    return await this.bookService.getOneBook(id);
+    return await this.bookService.getById(id);
   }
 
   @Public()

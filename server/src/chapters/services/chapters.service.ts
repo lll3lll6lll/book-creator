@@ -12,7 +12,7 @@ export class ChaptersService {
     private readonly chapterRepository: Repository<Chapter>,
   ) {}
 
-  async createChapter(chapterCreate: ChapterCreate): Promise<Chapter> {
+  async create(chapterCreate: ChapterCreate): Promise<Chapter> {
     const lastOrder = await this.chapterRepository.maximum('order', {
       book_id: chapterCreate.book_id,
     });
@@ -22,21 +22,21 @@ export class ChaptersService {
     });
   }
 
-  async getOneChapter(id: number): Promise<Chapter> {
+  async getById(id: number): Promise<Chapter> {
     return await this.chapterRepository.findOneBy({ id });
   }
 
-  async removeChapter(id: number): Promise<number> {
+  async remove(id: number): Promise<number> {
     await this.chapterRepository.delete({ id });
     return id;
   }
 
-  async updateChapter(chapterUpdate: ChapterUpdate): Promise<Chapter> {
+  async update(chapterUpdate: ChapterUpdate): Promise<Chapter> {
     await this.chapterRepository.update(
       { id: chapterUpdate.id },
       { ...chapterUpdate },
     );
-    return await this.getOneChapter(chapterUpdate.id);
+    return await this.getById(chapterUpdate.id);
   }
 
   async getBookChapters(book_id: number): Promise<Chapter[]> {

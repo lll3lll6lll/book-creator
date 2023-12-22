@@ -29,7 +29,7 @@ export class CommentsResolver {
     @Args({ name: 'dto', type: () => CommentCreate })
     commentCreate: CommentCreate,
   ): Promise<Comment> {
-    return await this.commentsService.createComment(commentCreate);
+    return await this.commentsService.create(commentCreate);
   }
 
   @Mutation(() => Comment)
@@ -37,18 +37,18 @@ export class CommentsResolver {
     @Args({ name: 'dto', type: () => CommentUpdate })
     commentUpdate: CommentUpdate,
   ): Promise<Comment> {
-    return await this.commentsService.updateComment(commentUpdate);
+    return await this.commentsService.update(commentUpdate);
   }
 
   @Mutation(() => Number)
   async removeUser(@Args('id') id: number): Promise<number> {
-    return await this.commentsService.removeComment(id);
+    return await this.commentsService.remove(id);
   }
 
   @Public()
   @Query(() => Comment)
   async getOneComment(@Args('id') id: number): Promise<Comment> {
-    return await this.commentsService.getOneComment(id);
+    return await this.commentsService.getById(id);
   }
 
   @Public()
@@ -56,7 +56,7 @@ export class CommentsResolver {
   async getChapterComments(
     @Args('chapter_id') chapter_id: number,
   ): Promise<Comment> {
-    return await this.commentsService.getOneComment(chapter_id);
+    return await this.commentsService.getById(chapter_id);
   }
 
   @Public()
@@ -69,13 +69,13 @@ export class CommentsResolver {
   @ResolveField('book', () => Book)
   async getBook(@Parent() comment: Comment) {
     const { book_id } = comment;
-    return this.booksService.getOneBook(book_id);
+    return this.booksService.getById(book_id);
   }
 
   @Public()
   @ResolveField('chapter', () => Chapter)
   async getChapter(@Parent() comment: Comment) {
     const { chapter_id } = comment;
-    return this.chaptersService.getOneChapter(chapter_id);
+    return this.chaptersService.getById(chapter_id);
   }
 }

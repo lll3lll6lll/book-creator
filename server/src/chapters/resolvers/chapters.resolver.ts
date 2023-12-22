@@ -29,7 +29,7 @@ export class ChaptersResolver {
     @Args({ name: 'dto', type: () => ChapterCreate })
     chapterCreate: ChapterCreate,
   ): Promise<Chapter> {
-    return await this.chaptersService.createChapter(chapterCreate);
+    return await this.chaptersService.create(chapterCreate);
   }
 
   @Mutation(() => Chapter)
@@ -37,18 +37,18 @@ export class ChaptersResolver {
     @Args({ name: 'dto', type: () => ChapterUpdate })
     chapterUpdate: ChapterUpdate,
   ): Promise<Chapter> {
-    return await this.chaptersService.updateChapter(chapterUpdate);
+    return await this.chaptersService.update(chapterUpdate);
   }
 
   @Mutation(() => Number)
   async removeChapter(@Args('id') id: number): Promise<number> {
-    return await this.chaptersService.removeChapter(id);
+    return await this.chaptersService.remove(id);
   }
 
   @Public()
   @Query(() => Chapter)
   async getOneChapter(@Args('id') id: number): Promise<Chapter> {
-    return await this.chaptersService.getOneChapter(id);
+    return await this.chaptersService.getById(id);
   }
 
   @Public()
@@ -61,7 +61,7 @@ export class ChaptersResolver {
   @ResolveField('book', () => Book)
   async getBook(@Parent() chapter: Chapter) {
     const { book_id } = chapter;
-    return this.booksService.getOneBook(book_id);
+    return this.booksService.getById(book_id);
   }
   @Public()
   @ResolveField('comments', () => [Comment])
