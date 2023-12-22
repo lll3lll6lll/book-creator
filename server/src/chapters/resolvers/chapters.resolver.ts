@@ -14,6 +14,7 @@ import { BooksService } from '@src/books/services/books.service';
 import { Book } from '@src/books/entities/book.entity';
 import { Comment } from '@src/comments/entities/comment.entity';
 import { CommentsService } from '@src/comments/services/comments.service';
+import { Public } from '../../shared/decorators';
 
 @Resolver(() => Chapter)
 export class ChaptersResolver {
@@ -44,22 +45,25 @@ export class ChaptersResolver {
     return await this.chaptersService.removeChapter(id);
   }
 
+  @Public()
   @Query(() => Chapter)
   async getOneChapter(@Args('id') id: number): Promise<Chapter> {
     return await this.chaptersService.getOneChapter(id);
   }
 
+  @Public()
   @Query(() => [Chapter])
   async getBookChapters(@Args('book_id') book_id: number): Promise<Chapter[]> {
     return await this.chaptersService.getBookChapters(book_id);
   }
 
+  @Public()
   @ResolveField('book', () => Book)
   async getBook(@Parent() chapter: Chapter) {
     const { book_id } = chapter;
     return this.booksService.getOneBook(book_id);
   }
-
+  @Public()
   @ResolveField('comments', () => [Comment])
   async getComments(@Parent() chapter: Chapter) {
     const { id } = chapter;

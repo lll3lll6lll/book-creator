@@ -3,6 +3,6 @@ import { CustomDecorator } from '@nestjs/common/decorators/core/set-metadata.dec
 
 export const isPublic = Symbol('is-public');
 
-export function IsPublic(): CustomDecorator<any> {
+export function Public(): CustomDecorator<any> {
   return SetMetadata(isPublic, true);
 }

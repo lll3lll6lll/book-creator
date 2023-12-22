@@ -9,9 +9,9 @@ import { AuthService } from '@src/auth/services/auth.service';
 import { AuthDto } from '@src/auth/dto/auth.dto';
 import { AuthResponseDto } from '@src/auth/dto/auth.response.dto';
 import { AuthTokenResponseDto } from '@src/auth/auth-token/dto/auth-token. response.dto';
-import { IsPublic } from '@src/shared/decorators';
+import { Public } from '@src/shared/decorators';
 
-@IsPublic()
+@Public()
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
