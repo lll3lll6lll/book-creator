@@ -41,6 +41,8 @@
     "@nestjs/typeorm": "^10.0.1",
     "@types/bcrypt": "^5.0.2",
     "@types/passport-local": "^1.0.38",
+    "aws-lambda": "^1.0.7",
+    "aws-serverless-express": "^3.4.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "cookie-parser": "^1.4.6",
