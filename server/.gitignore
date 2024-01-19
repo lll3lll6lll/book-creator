@@ -47,3 +47,4 @@ lerna-debug.log*
 */tmp/
 temp
 temp-*
+temp_artifacts

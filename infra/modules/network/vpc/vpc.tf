@@ -2,16 +2,6 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-data "aws_subnets" "public" {
-  filter {
-    name   = "vpc-id"
-    values = [aws_vpc.this.id]
-  }
-  tags = {
-    Tier = "public"
-  }
-}
-
 
 locals {
   name = "${var.name}-${var.env}"
@@ -50,24 +40,32 @@ resource "aws_subnet" "public" {
   tags = merge({
     Name = "${local.name }-public-${local.az_names[count.index]}"
     Tier = "public"
+    Availability_zone = local.az_names[count.index]
   })
 }
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.this.id
-  }
   tags = {
     Name = "${local.name }-public-rt"
     Tier = "public"
   }
 }
 
+resource "aws_route" "public_internet_gateway" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this.id
+
+  timeouts {
+    create = "5m"
+  }
+}
+
+
 resource "aws_route_table_association" "public" {
-  for_each      = toset(data.aws_subnets.public.ids)
-  subnet_id   = each.value
+  count      = length(aws_subnet.public)
+  subnet_id   = element(aws_subnet.public[*].id, count.index)
   route_table_id = aws_route_table.public.id
 }
 
@@ -82,6 +80,7 @@ resource "aws_subnet" "private" {
   tags = merge({
     Name = "${local.name }-private-${local.az_names[count.index]}"
     Tier = "private"
+    Availability_zone = local.az_names[count.index]
   })
 }
 
@@ -95,5 +94,6 @@ resource "aws_subnet" "database" {
   tags = merge({
     Name = "${local.name }-database-${local.az_names[count.index]}"
     Tier = "database"
+    Availability_zone = local.az_names[count.index]
   })
 }
