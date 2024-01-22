@@ -1,4 +1,6 @@
-
+locals {
+  invoked_by = ["logs.amazonaws.com", "apigateway.amazonaws.com"]
+}
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
@@ -24,6 +26,29 @@ resource "aws_lambda_function" "this" {
     security_group_ids = var.vpc_security_group_ids
     subnet_ids         = var.vpc_subnet_ids
   }
+}
+
+
+resource "aws_lambda_permission" "permission_1" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = var.function_name
+  principal     = "apigateway.amazonaws.com"
+}
+
+resource "aws_lambda_permission" "permission_2" {
+  statement_id  = "AllowLogsInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = var.function_name
+  principal     = "logs.amazonaws.com"
+}
+
+
+resource "aws_lambda_permission" "permission_3" {
+  statement_id  = "AllowEventsInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = var.function_name
+  principal     = "events.amazonaws.com"
 }
 
 

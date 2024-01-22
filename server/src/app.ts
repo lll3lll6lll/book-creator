@@ -3,33 +3,28 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { INestApplication } from '@nestjs/common';
-import { GraphQLSchemaHost } from '@nestjs/graphql';
-import { writeFileSync } from 'fs';
-import { join } from 'path';
-import { printSchema } from 'graphql';
-
-import { createServer } from 'aws-serverless-express';
+// import serverlessExpress from '@codegenie/serverless-express';
+import { configure as serverlessExpress } from '@codegenie/serverless-express';
+import { Handler } from 'aws-lambda';
 
 async function createApp(): Promise<INestApplication> {
   const app = await NestFactory.create(AppModule, { snapshot: true });
   app.use(cookieParser());
-
   app.setGlobalPrefix('api');
+
   return app;
 }
-export async function bootstrap() {
+
+export async function bootstrap(): Promise<Handler> {
   const app = await createApp();
+  await app.init();
   const config = await app.get(ConfigService);
   const port = config.get<number>('PORT');
-
-  // if (process.env.NODE_ENV === 'production') {
-  // const { schema } = app.get(GraphQLSchemaHost);
-  // writeFileSync(join(process.cwd(), `/schema.gql`), printSchema(schema));
-  // }
 
   await app.listen(port || 3000, () => {
     console.log(`App started on port: ${port}`);
   });
 
-  return createServer(app);
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
 }

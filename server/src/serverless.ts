@@ -1,13 +1,13 @@
-import { Server } from 'http';
-import { Context } from 'aws-lambda';
-import { proxy, Response } from 'aws-serverless-express';
 import { bootstrap } from './app';
+import { Callback, Context, Handler } from 'aws-lambda';
 
-let cachedServer: Server;
+let server: Handler;
 
-export async function handler(event: any, context: Context): Promise<Response> {
-  if (!cachedServer) {
-    cachedServer = await bootstrap();
-  }
-  return proxy(cachedServer, event, context, 'PROMISE').promise;
-}
+export const handler: Handler = async (
+  event: any,
+  context: Context,
+  callback: Callback,
+) => {
+  server = server ?? (await bootstrap());
+  return server(event, context, callback);
+};

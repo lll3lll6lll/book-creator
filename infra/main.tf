@@ -79,11 +79,11 @@ module "lambda" {
   depends_on = [module.lambda_modules_layer.arn]
 }
 
-#module "appSync" {
-#  source = "./modules/appSync"
-#  name   = "${local.name}_graphql"
-#  schema = file("../server/schema.gql")
-#}
+module "api-gtw" {
+  source = "./modules/apiGateway"
+  name = "${local.name}-api-gtw"
+  lambda_invoke_arn = module.lambda.invoke_arn
+}
 
 
 
