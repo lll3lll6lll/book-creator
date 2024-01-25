@@ -1,6 +1,4 @@
-locals {
-  invoked_by = ["logs.amazonaws.com", "apigateway.amazonaws.com"]
-}
+
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
@@ -17,6 +15,7 @@ resource "aws_lambda_function" "this" {
   runtime          = var.runtime
   layers           = var.layers_arn
   depends_on      =  [data.archive_file.lambda_zip]
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   environment {
     variables = var.environment_variables
@@ -30,25 +29,28 @@ resource "aws_lambda_function" "this" {
 
 
 resource "aws_lambda_permission" "permission_1" {
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "AllowAPIGatewayInvoke1"
   action        = "lambda:InvokeFunction"
   function_name = var.function_name
   principal     = "apigateway.amazonaws.com"
+  depends_on = [aws_lambda_function.this]
 }
 
 resource "aws_lambda_permission" "permission_2" {
-  statement_id  = "AllowLogsInvoke"
+  statement_id  = "AllowLogsInvoke1"
   action        = "lambda:InvokeFunction"
   function_name = var.function_name
   principal     = "logs.amazonaws.com"
+  depends_on = [aws_lambda_function.this]
 }
 
 
 resource "aws_lambda_permission" "permission_3" {
-  statement_id  = "AllowEventsInvoke"
+  statement_id  = "AllowEventsInvoke1"
   action        = "lambda:InvokeFunction"
   function_name = var.function_name
   principal     = "events.amazonaws.com"
+  depends_on = [aws_lambda_function.this]
 }
 
 

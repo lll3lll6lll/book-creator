@@ -1,6 +1,14 @@
 locals {
-  dir = "${var.artifacts_dir}/${var.name}"
-  dir_zip = "${var.artifacts_dir}/${var.name}.zip"
+#  ${formatdate("DD-MMM-YY_hh-mm", timestamp())}
+  output_name = var.name
+  dir = "${var.artifacts_dir}/${local.output_name}"
+  dir_zip = "${var.artifacts_dir}/${local.output_name}.zip"
+
+  src_files =  [
+      "${var.path_to_package_json}/package.json",
+      "${var.path_to_package_json}/package-lock.json"
+    ]
+  files_hash = sha256(join("", [for f in local.src_files : file("/${f}")]))
 }
 
 data "archive_file" "zip" {
@@ -11,7 +19,7 @@ data "archive_file" "zip" {
 }
 
 resource "terraform_data" "pack_node_modules" {
-  triggers_replace = [var.update]
+  triggers_replace = [local.files_hash, var.force]
 
   provisioner "local-exec" {
     interpreter = ["PowerShell", "-Command"]

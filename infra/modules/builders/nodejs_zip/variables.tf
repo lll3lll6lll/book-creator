@@ -12,8 +12,13 @@ variable "path_to_package_json" {
   type = string
 }
 
-variable "update" {
-  description = "set any value to  update zip data"
+
+variable "triggers_replace" {
+  type = list(string)
+  default = null
+}
+
+variable "force" {
   type = string
 }
 

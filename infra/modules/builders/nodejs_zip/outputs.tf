@@ -14,6 +14,7 @@ output "output_size" {
   value = data.archive_file.zip.output_size
 }
 
-output "filename" {
-  value = local.dir_zip
+
+output "output_base64sha256" {
+  value = data.archive_file.zip.output_base64sha256
 }

@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { INestApplication } from '@nestjs/common';
-// import serverlessExpress from '@codegenie/serverless-express';
+// import serverlessExpress from 'aws-serverless-express';
 import { configure as serverlessExpress } from '@codegenie/serverless-express';
 import { Handler } from 'aws-lambda';
 
@@ -27,4 +27,5 @@ export async function bootstrap(): Promise<Handler> {
 
   const expressApp = app.getHttpAdapter().getInstance();
   return serverlessExpress({ app: expressApp });
+  // return serverlessExpress.createServer(expressApp);
 }
