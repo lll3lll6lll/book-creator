@@ -73,16 +73,16 @@ locals {
 
 resource "terraform_data" "code_build" {
   triggers_replace = {
-    force = "1",
+    force = "2",
     src_length = length(local.src_files)
-    src_hash = sha256(join("", [for f in local.src_files : file("/${f}")]))
+    src_hash = sha256(join("", [for f in local.src_files : file("./${f}")]))
   }
 
   provisioner "local-exec" {
-    interpreter = ["PowerShell", "-Command"]
+#    interpreter = ["PowerShell", "-Command"]
     command = <<-EOT
 
-    cd ../server
+    cd "${local.src}"
     npm run build
 
     EOT

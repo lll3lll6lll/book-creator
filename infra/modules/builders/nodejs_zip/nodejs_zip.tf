@@ -8,7 +8,7 @@ locals {
       "${var.path_to_package_json}/package.json",
       "${var.path_to_package_json}/package-lock.json"
     ]
-  files_hash = sha256(join("", [for f in local.src_files : file("/${f}")]))
+  files_hash = sha256(join("", [for f in local.src_files : file("./${f}")]))
 }
 
 data "archive_file" "zip" {
@@ -22,20 +22,38 @@ resource "terraform_data" "pack_node_modules" {
   triggers_replace = [local.files_hash, var.force]
 
   provisioner "local-exec" {
-    interpreter = ["PowerShell", "-Command"]
     command = <<-EOT
 
-    Remove-Item ${local.dir}
-    mkdir -p ${local.dir}/nodejs
+      rm -rf "${local.dir}" || true
+      rm -f ${local.dir_zip} || true
+      mkdir -p "${local.dir}/nodejs" || true
 
-    Copy-Item -Path "${var.path_to_package_json}/package.json"  -Destination "${local.dir}/nodejs"
-    Copy-Item -Path "${var.path_to_package_json}/package-lock.json"  -Destination "${local.dir}/nodejs"
+      cp "${var.path_to_package_json}/package.json" "${local.dir}/nodejs/package.json"
+      cp "${var.path_to_package_json}/package-lock.json" "${local.dir}/nodejs/package-lock.json"
 
-    cd  ${local.dir}/nodejs
-    npm install --prefer-offline --omit=dev --omit=optional
+
+      cd  ${local.dir}/nodejs
+      npm ci --prefer-offline --omit=dev --omit=optional
 
     EOT
   }
+
+#  provisioner "local-exec" {
+#    interpreter = ["PowerShell", "-Command"]
+#    command = <<-EOT
+#
+#    Remove-Item ${local.dir}
+#    mkdir -p ${local.dir}/nodejs
+#
+#    Copy-Item -Path "${var.path_to_package_json}/package.json"  -Destination "${local.dir}/nodejs"
+#    Copy-Item -Path "${var.path_to_package_json}/package-lock.json"  -Destination "${local.dir}/nodejs"
+#
+#    cd  ${local.dir}/nodejs
+#    npm install --prefer-offline --omit=dev --omit=optional
+#
+#    EOT
+#  }
+
 }
 
 
