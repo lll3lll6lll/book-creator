@@ -11,3 +11,7 @@ variable "lambda_invoke_arn" {
   description = "ARN to be used for invoking Lambda Function from API Gateway"
   type = string
 }
+
+variable "stage_name" {
+  type = string
+}

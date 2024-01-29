@@ -27,4 +27,10 @@ variable "create_database_subnets" {
   default = false
 }
 
+variable "availability_zones" {
+  description = "A list of availability zones names or ids in the region"
+  type        = list(string)
+  default     = []
+}
+
 

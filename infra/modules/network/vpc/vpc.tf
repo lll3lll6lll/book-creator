@@ -5,7 +5,7 @@ data "aws_availability_zones" "available" {
 
 locals {
   name = "${var.name}-${var.env}"
-  az_names =  data.aws_availability_zones.available.names
+  az_names =  var.availability_zones
 }
 
 

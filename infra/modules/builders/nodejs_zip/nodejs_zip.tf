@@ -38,22 +38,6 @@ resource "terraform_data" "pack_node_modules" {
     EOT
   }
 
-#  provisioner "local-exec" {
-#    interpreter = ["PowerShell", "-Command"]
-#    command = <<-EOT
-#
-#    Remove-Item ${local.dir}
-#    mkdir -p ${local.dir}/nodejs
-#
-#    Copy-Item -Path "${var.path_to_package_json}/package.json"  -Destination "${local.dir}/nodejs"
-#    Copy-Item -Path "${var.path_to_package_json}/package-lock.json"  -Destination "${local.dir}/nodejs"
-#
-#    cd  ${local.dir}/nodejs
-#    npm install --prefer-offline --omit=dev --omit=optional
-#
-#    EOT
-#  }
-
 }
 
 

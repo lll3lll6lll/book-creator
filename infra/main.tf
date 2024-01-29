@@ -1,20 +1,46 @@
-provider "aws" {
-  region     = "eu-central-1"
-}
-
 terraform {
   backend "s3" {
-#    encrypt        = true
+    #    encrypt        = true
     bucket = "terraform-states-2024" // Bucket where to SAVE Terraform State
     key    = "dev/terraform.tfstate" // Object name in the bucket to SAVE Terraform State
     region = "eu-central-1"          // Region where bycket created
   }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+
+provider "aws" {
+  region     = "eu-central-1"
+  default_tags {
+    tags = {
+      hashicorp-learn = "module-use"
+    }
+  }
+}
+
+
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 locals {
-  name = "coconut"
+  name = "orange"
   env = "dev"
   artifacts_dir = "temp"
+  availability_zones = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
+  src= "../server"
+  src_files =  flatten([
+    fileset("/", "${local.src}/src/**/*.ts"),
+    [
+      "${local.src}/package.json",
+      "${local.src}/package-lock.json"
+    ]
+  ])
 }
 
 #module "storage" {
@@ -30,7 +56,8 @@ module vpc {
   env = local.env
   create_public_subnets = true
   create_private_subnets = true
-  create_database_subnets = false
+  create_database_subnets = true
+  availability_zones = local.availability_zones
 }
 
 module lambda_role {
@@ -60,17 +87,6 @@ module "lambda_modules_layer" {
   depends_on = [module.pack_node_modules]
 }
 
-locals {
-  src= "../server"
-  src_files =  flatten([
-    fileset("/", "${local.src}/src/**/*.ts"),
-    [
-      "${local.src}/package.json",
-      "${local.src}/package-lock.json"
-    ]
-  ])
-}
-
 resource "terraform_data" "code_build" {
   triggers_replace = {
     force = "2",
@@ -79,7 +95,6 @@ resource "terraform_data" "code_build" {
   }
 
   provisioner "local-exec" {
-#    interpreter = ["PowerShell", "-Command"]
     command = <<-EOT
 
     cd "${local.src}"
@@ -106,6 +121,7 @@ module "lambda" {
   vpc_security_group_ids = [module.vpc.default_security_group_id]
 
   depends_on = [
+    module.vpc,
     module.lambda_modules_layer.arn,
     terraform_data.code_build
   ]
@@ -114,19 +130,29 @@ module "lambda" {
 module "api-gtw" {
   source = "./modules/apiGateway"
   name = "${local.name}-api-gtw"
+  stage_name = local.env
   lambda_invoke_arn = module.lambda.invoke_arn
 }
 
 
+resource "random_password" "master_db" {
+  length  = 20
+  special = false
+}
 
-#resource "aws_cloudwatch_log_group" "lambda" {
-#  name = "/aws/lambda/${module.lambda.function_name}"
-#  retention_in_days = 30
-#  tags = {
-#    Environment = local.env
-#    Application = "${local.name}-lambda"
-#  }
-#}
+module "aurora_serverless" {
+  source                  = "./modules/rds"
+  name                    = local.name
+  master_username         = "root"
+  backup_retention_period = 7
+  master_password         = random_password.master_db.result
+  subnets                 = module.vpc.database_subnets
+  availability_zones      = local.availability_zones
+
+  depends_on              = [module.vpc]
+}
+
+
 
 
 

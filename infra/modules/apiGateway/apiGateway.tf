@@ -29,8 +29,7 @@ resource "aws_apigatewayv2_route" "root" {
 
 resource "aws_apigatewayv2_stage" "gtw-2" {
   api_id = aws_apigatewayv2_api.graphql.id
-  #  name   = var.env
-  name   = "dev"
+  name   = var.stage_name
   auto_deploy = true
 
   access_log_settings {
