@@ -1,2 +1,3 @@
 import { lazy } from 'react';
-export const MyBooksPageAsync = lazy(() =>import('./MyBooksPage'));
+
+export const MyBooksPageAsync = lazy(() => import('./MyBooksPage'));

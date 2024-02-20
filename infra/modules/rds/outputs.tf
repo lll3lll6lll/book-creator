@@ -64,3 +64,7 @@ output "cluster_hosted_zone_id" {
   description = "The Route53 Hosted Zone ID of the endpoint"
   value       = try(aws_rds_cluster.this.hosted_zone_id, null)
 }
+
+output "database_name" {
+  value = try(aws_rds_cluster.this.database_name, null)
+}

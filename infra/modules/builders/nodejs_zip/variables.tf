@@ -1,11 +1,11 @@
 variable "name" {
   description = "Name of directory"
-  type = string
+  type        = string
 }
 
 variable "artifacts_dir" {
   description = "Directory name where saved zipped data"
-  type = string
+  type        = string
 }
 
 variable "path_to_package_json" {
@@ -14,7 +14,7 @@ variable "path_to_package_json" {
 
 
 variable "triggers_replace" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
 

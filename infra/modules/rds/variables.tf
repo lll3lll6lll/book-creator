@@ -43,7 +43,7 @@ variable "skip_final_snapshot" {
 variable "backup_retention_period" {
   description = "The days to retain backups for"
   type        = number
-  default     = null
+  default     = 7
 }
 
 variable "monitoring_interval" {
@@ -63,3 +63,4 @@ variable "master_password" {
   type        = string
   default     = null
 }
+

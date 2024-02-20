@@ -15,7 +15,7 @@ terraform {
 
 
 provider "aws" {
-  region     = "eu-central-1"
+  region = "eu-central-1"
   default_tags {
     tags = {
       hashicorp-learn = "module-use"
@@ -29,12 +29,12 @@ data "aws_availability_zones" "available" {
 }
 
 locals {
-  name = "orange"
-  env = "dev"
-  artifacts_dir = "temp"
-  availability_zones = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
-  src= "../server"
-  src_files =  flatten([
+  name               = "orange"
+  env                = "dev"
+  artifacts_dir      = "temp"
+  availability_zones = ["eu-central-1a", "eu-central-1b", ]
+  src                = "../server"
+  src_files = flatten([
     fileset("/", "${local.src}/src/**/*.ts"),
     [
       "${local.src}/package.json",
@@ -50,48 +50,49 @@ locals {
 #  acl = "public-read"
 #}
 
-module vpc {
-  source = "./modules/network/vpc"
-  name = local.name
-  env = local.env
-  create_public_subnets = true
-  create_private_subnets = true
+module "vpc" {
+  source                  = "./modules/network/vpc"
+  name                    = local.name
+  env                     = local.env
+  create_public_subnets   = true
+  create_private_subnets  = true
   create_database_subnets = true
-  availability_zones = local.availability_zones
+  availability_zones      = local.availability_zones
 }
 
-module lambda_role {
-  source = "./modules/iam/role"
-  name   = "ServiceRoleForLambda_${local.name}"
+module "lambda_role" {
+  source                     = "./modules/iam/role"
+  name                       = "ServiceRoleForLambda_${local.name}"
   path_to_assume_role_policy = "./policies/lambda-trust-policy.json"
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AWSLambda_FullAccess",
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
   ]
 }
 
-module "pack_node_modules"   {
-  source = "./modules/builders/nodejs_zip"
-  name = "${local.name}_node_modules"
-  force = "8"
-  artifacts_dir = local.artifacts_dir
+module "pack_node_modules" {
+  source               = "./modules/builders/nodejs_zip"
+  name                 = "${local.name}_node_modules"
+  force                = "8"
+  artifacts_dir        = local.artifacts_dir
   path_to_package_json = "../server"
 }
 
 module "lambda_modules_layer" {
-  source = "./modules/lambda/layer"
-  filename = module.pack_node_modules.output_path
-  name = "${local.name}_node_modules"
-  runtime = "nodejs20.x"
+  source           = "./modules/lambda/layer"
+  filename         = module.pack_node_modules.output_path
+  name             = "${local.name}_node_modules"
+  runtime          = "nodejs20.x"
   source_code_hash = module.pack_node_modules.output_base64sha256
-  depends_on = [module.pack_node_modules]
+  depends_on       = [module.pack_node_modules]
 }
 
 resource "terraform_data" "code_build" {
   triggers_replace = {
-    force = "2",
+    force      = "2",
     src_length = length(local.src_files)
-    src_hash = sha256(join("", [for f in local.src_files : file("./${f}")]))
+    src_hash   = sha256(join("", [for f in local.src_files : file("./${f}")]))
   }
 
   provisioner "local-exec" {
@@ -112,25 +113,46 @@ module "lambda" {
   handler       = "lambda.handler"
   runtime       = "nodejs20.x"
   aim_role_arn  = module.lambda_role.arn
-  layers_arn = [ module.lambda_modules_layer.arn ]
+  layers_arn    = [module.lambda_modules_layer.arn]
 
-  source_dir   = "../server/dist"
+  source_dir    = "../server/dist"
   artifacts_dir = local.artifacts_dir
+  force         = "1"
 
-  vpc_subnet_ids  = module.vpc.public_subnets
-  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  #  vpc_subnet_ids  = module.vpc.public_subnets
+  #  vpc_security_group_ids = [module.vpc.default_security_group_id]
+
+  environment_variables = {
+    NODE_ENV = local.env
+
+    #    DB_QUERY_LOGGING=true
+    #    DATABASE_SCHEMA=boo_creator
+    DATABASE_NAME      = module.aurora_serverless.database_name
+    DATABASE_HOST      = module.aurora_serverless.cluster_endpoint
+    DATABASE_USERNAME  = module.aurora_serverless.cluster_master_username
+    DATABASE_PASSWORD  = module.aurora_serverless.cluster_master_password
+    DATABASE_PORT      = module.aurora_serverless.cluster_port
+    DATABASE_SSL       = false
+    DATABASE_POOL_SIZE = 40
+
+    JWT_ACCESS_SECRET   = "secret-super-secret-token-access"
+    JWT_ACCESS_EXPIRED  = "40h"
+    JWT_REFRESH_SECRET  = "secret-super-secret-token-refresh"
+    JWT_REFRESH_EXPIRED = "60d"
+  }
 
   depends_on = [
     module.vpc,
     module.lambda_modules_layer.arn,
-    terraform_data.code_build
+    terraform_data.code_build,
+    module.aurora_serverless
   ]
 }
 
 module "api-gtw" {
-  source = "./modules/apiGateway"
-  name = "${local.name}-api-gtw"
-  stage_name = local.env
+  source            = "./modules/apiGateway"
+  name              = "${local.name}-api-gtw"
+  stage_name        = local.env
   lambda_invoke_arn = module.lambda.invoke_arn
 }
 
@@ -146,9 +168,8 @@ module "aurora_serverless" {
   master_username         = "root"
   backup_retention_period = 7
   master_password         = random_password.master_db.result
-  subnets                 = module.vpc.database_subnets
+  subnets                 = module.vpc.public_subnets
   availability_zones      = local.availability_zones
-
   depends_on              = [module.vpc]
 }
 

@@ -52,8 +52,13 @@ variable "aim_role_arn" {
 }
 
 variable "layers_arn" {
-  type        = list(string)
-  default     = null
+  type    = list(string)
+  default = null
+}
+
+variable "force" {
+  type    = string
+  default = ""
 }
 
 

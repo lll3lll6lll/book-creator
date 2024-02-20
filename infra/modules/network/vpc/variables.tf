@@ -8,22 +8,22 @@ variable "env" {
 
 
 variable "vpc_cidr_block" {
-  type = string
+  type    = string
   default = "10.0.0.0/16"
 }
 
 variable "create_public_subnets" {
-  type = bool
+  type    = bool
   default = true
 }
 
 variable "create_private_subnets" {
-  type = bool
+  type    = bool
   default = true
 }
 
 variable "create_database_subnets" {
-  type = bool
+  type    = bool
   default = false
 }
 

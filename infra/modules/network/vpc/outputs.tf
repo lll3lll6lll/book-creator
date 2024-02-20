@@ -2,9 +2,9 @@
 # VPC
 ################################################################################
 
-output vpc_id {
+output "vpc_id" {
   description = "The ID of the VPC"
-  value = try(aws_vpc.this.id, null)
+  value       = try(aws_vpc.this.id, null)
 }
 
 output "vpc_arn" {

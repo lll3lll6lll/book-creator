@@ -1,31 +1,35 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { INestApplication } from '@nestjs/common';
-// import serverlessExpress from 'aws-serverless-express';
 import { configure as serverlessExpress } from '@codegenie/serverless-express';
 import { Handler } from 'aws-lambda';
+import * as process from 'process';
+
+let app;
 
 async function createApp(): Promise<INestApplication> {
-  const app = await NestFactory.create(AppModule, { snapshot: true });
+  app = await NestFactory.create(AppModule, { snapshot: true });
   app.use(cookieParser());
-  app.setGlobalPrefix('api');
+
+  if (process.env.NODE_ENV !== 'local') {
+    app.setGlobalPrefix(process.env.NODE_ENV);
+  }
 
   return app;
+}
+
+export async function getApp() {
+  if (app) return app;
+  return await createApp();
 }
 
 export async function bootstrap(): Promise<Handler> {
   const app = await createApp();
   await app.init();
-  const config = await app.get(ConfigService);
-  const port = config.get<number>('PORT');
 
-  await app.listen(port || 3000, () => {
-    console.log(`App started on port: ${port}`);
-  });
+  console.log('bootstrap function init app');
 
   const expressApp = app.getHttpAdapter().getInstance();
   return serverlessExpress({ app: expressApp });
-  // return serverlessExpress.createServer(expressApp);
 }

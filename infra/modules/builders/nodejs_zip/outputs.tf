@@ -1,8 +1,8 @@
-output archive_file {
+output "archive_file" {
   value = data.archive_file.zip
 }
 
-output archive_file_id {
+output "archive_file_id" {
   value = data.archive_file.zip.id
 }
 

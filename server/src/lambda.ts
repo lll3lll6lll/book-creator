@@ -10,6 +10,7 @@ export const handler: Handler = async (
   callback: Callback,
 ) => {
   server = server ?? (await bootstrap());
+
+  console.log('event', JSON.stringify(event));
   return server(event, context, callback);
-  // return serverlessExpress.proxy(server, event, context, callback);
 };

@@ -1,11 +1,11 @@
 import React from 'react';
 
 const BookPage = () => {
-    return (
-        <div>
-            Book Page
-        </div>
-    );
+	return (
+		<div>
+			BookPage
+		</div>
+	);
 };
 
 export default BookPage;
