@@ -1,7 +1,3 @@
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
 
 locals {
   name     = "${var.name}-${var.env}"
@@ -25,7 +21,10 @@ resource "aws_vpc" "this" {
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
   tags = merge(
-    { Name = "${local.name}-igw" }
+    {
+      Name = "${local.name}-igw"
+      Environment = var.env
+    }
   )
 }
 
@@ -41,6 +40,7 @@ resource "aws_subnet" "public" {
     Name              = "${local.name}-public-${local.az_names[count.index]}"
     Tier              = "public"
     Availability_zone = local.az_names[count.index]
+    Environment = var.env
   })
 }
 
@@ -49,6 +49,7 @@ resource "aws_route_table" "public" {
   tags = {
     Name = "${local.name}-public-rt"
     Tier = "public"
+    Environment = var.env
   }
 }
 
@@ -81,7 +82,23 @@ resource "aws_subnet" "private" {
     Name              = "${local.name}-private-${local.az_names[count.index]}"
     Tier              = "private"
     Availability_zone = local.az_names[count.index]
+    Environment = var.env
   })
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.this.id
+  tags = {
+    Name = "${local.name}-private-rt"
+    Tier = "private"
+    Environment = var.env
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count          = length(aws_subnet.private)
+  subnet_id      = element(aws_subnet.private[*].id, count.index)
+  route_table_id = aws_route_table.private.id
 }
 
 #====== DATABASE SUBNETS =====
@@ -94,6 +111,32 @@ resource "aws_subnet" "database" {
   tags = merge({
     Name              = "${local.name}-database-${local.az_names[count.index]}"
     Tier              = "database"
+    Environment = var.env
     Availability_zone = local.az_names[count.index]
   })
+}
+
+resource "aws_route_table" "database" {
+  vpc_id = aws_vpc.this.id
+  tags = {
+    Name = "${local.name}-database-rt"
+    Tier = "database"
+    Environment = var.env
+  }
+}
+
+resource "aws_route_table_association" "database" {
+  count          = length(aws_subnet.database)
+  subnet_id      = element(aws_subnet.database[*].id, count.index)
+  route_table_id = aws_route_table.database.id
+}
+
+resource "aws_route" "database_internet_gateway" {
+  route_table_id         = aws_route_table.database.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this.id
+
+  timeouts {
+    create = "5m"
+  }
 }

@@ -24,4 +24,5 @@ export const dbConfig: PostgresConnectionOptions = {
   poolSize: process.env.DATABASE_POOL_SIZE
     ? +process.env.DATABASE_POOL_SIZE || 40
     : 40,
+  connectTimeoutMS: 5000,
 };

@@ -5,7 +5,7 @@ locals {
 
 #================================================================
 resource "aws_db_subnet_group" "this" {
-  name        = "${var.name}-db-subnets-group"
+  name        = "${var.name}-aurora-db-subnets-group"
   description = "For Aurora cluster ${var.name}"
   subnet_ids  = var.subnets
 
@@ -23,15 +23,13 @@ resource "aws_rds_cluster" "this" {
   master_password         = var.master_password
   backup_retention_period = var.backup_retention_period
   port                    = local.port
-  #  db_subnet_group_name    = aws_db_subnet_group.this.name
-  db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
+  db_subnet_group_name    = aws_db_subnet_group.this.name
   storage_encrypted    = var.storage_encrypted
   skip_final_snapshot  = true
   apply_immediately    = true
   #  manage_master_user_password = true
   #  final_snapshot_identifier = "${var.name}-final-snapshot"
-  vpc_security_group_ids = [aws_security_group.allow_db.id]
-
+  vpc_security_group_ids = [aws_security_group.this.id]
 
   scaling_configuration {
     auto_pause               = true
@@ -44,9 +42,10 @@ resource "aws_rds_cluster" "this" {
   depends_on = [aws_cloudwatch_log_group.this]
 }
 
-resource "aws_security_group" "allow_db" {
+resource "aws_security_group" "this" {
   name        = "allow_db"
   description = "Allow DB"
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port        = 5432
@@ -66,34 +65,8 @@ resource "aws_security_group" "allow_db" {
 
 
 
-# Настроим подсеть 'a' для региона us-east-1
-resource "aws_default_subnet" "db_subnet_a" {
-  availability_zone = "eu-central-1a"
-  tags = {
-    Name = "Default subnet for us-east-1a"
-  }
-}
-
-# Настроим подсеть 'b' для региона us-east-1
-resource "aws_default_subnet" "db_subnet_b" {
-  availability_zone = "eu-central-1b"
-
-  tags = {
-    Name = "Default subnet for us-east-1b"
-  }
-}
-
-# Объеденим подсети в группу
-resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "db_subnet_group"
-  subnet_ids = [aws_default_subnet.db_subnet_a.id, aws_default_subnet.db_subnet_b.id]
-}
-
-
-
-
 #=====================CloudWatch Log Group=============================
 resource "aws_cloudwatch_log_group" "this" {
-  name              = "/aws/rds/cluster/${var.name}"
+  name              = "/aws/aurora-rds/cluster/${var.name}"
   retention_in_days = 7
 }

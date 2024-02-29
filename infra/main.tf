@@ -23,7 +23,6 @@ provider "aws" {
   }
 }
 
-
 data "aws_availability_zones" "available" {
   state = "available"
 }
@@ -32,7 +31,7 @@ locals {
   name               = "orange"
   env                = "dev"
   artifacts_dir      = "temp"
-  availability_zones = ["eu-central-1a", "eu-central-1b", ]
+  availability_zones = ["eu-central-1a", "eu-central-1b"   ]
   src                = "../server"
   src_files = flatten([
     fileset("/", "${local.src}/src/**/*.ts"),
@@ -86,11 +85,12 @@ module "lambda_modules_layer" {
   runtime          = "nodejs20.x"
   source_code_hash = module.pack_node_modules.output_base64sha256
   depends_on       = [module.pack_node_modules]
+
 }
 
 resource "terraform_data" "code_build" {
   triggers_replace = {
-    force      = "2",
+    force      = "4",
     src_length = length(local.src_files)
     src_hash   = sha256(join("", [for f in local.src_files : file("./${f}")]))
   }
@@ -105,6 +105,12 @@ resource "terraform_data" "code_build" {
   }
 }
 
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "../server/dist"
+  output_path = "${local.artifacts_dir}/${local.name}_lambda.zip"
+}
+
 module "lambda" {
   source = "./modules/lambda/function"
 
@@ -114,26 +120,29 @@ module "lambda" {
   runtime       = "nodejs20.x"
   aim_role_arn  = module.lambda_role.arn
   layers_arn    = [module.lambda_modules_layer.arn]
+  filename      = data.archive_file.lambda_zip.output_path
 
   source_dir    = "../server/dist"
   artifacts_dir = local.artifacts_dir
-  force         = "1"
+  force         = "4"
+  timeout       = 60
 
-  #  vpc_subnet_ids  = module.vpc.public_subnets
-  #  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  vpc_subnet_ids  = module.vpc.public_subnets
+  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   environment_variables = {
     NODE_ENV = local.env
 
     #    DB_QUERY_LOGGING=true
     #    DATABASE_SCHEMA=boo_creator
-    DATABASE_NAME      = module.aurora_serverless.database_name
-    DATABASE_HOST      = module.aurora_serverless.cluster_endpoint
-    DATABASE_USERNAME  = module.aurora_serverless.cluster_master_username
-    DATABASE_PASSWORD  = module.aurora_serverless.cluster_master_password
-    DATABASE_PORT      = module.aurora_serverless.cluster_port
-    DATABASE_SSL       = false
-    DATABASE_POOL_SIZE = 40
+    DATABASE_NAME      = module.rds_postgres.rds_database_name
+    DATABASE_HOST      = module.rds_postgres.rds_hostname
+    DATABASE_USERNAME  = module.rds_postgres.rds_username
+    DATABASE_PASSWORD  = module.rds_postgres.rds_password
+    DATABASE_PORT      = module.rds_postgres.rds_port
+    DATABASE_SSL       = true
+    DATABASE_POOL_SIZE = 2
 
     JWT_ACCESS_SECRET   = "secret-super-secret-token-access"
     JWT_ACCESS_EXPIRED  = "40h"
@@ -145,7 +154,50 @@ module "lambda" {
     module.vpc,
     module.lambda_modules_layer.arn,
     terraform_data.code_build,
-    module.aurora_serverless
+    module.rds_postgres,
+    data.archive_file.lambda_zip
+  ]
+}
+
+module "lambda_db_migrations" {
+  source = "./modules/lambda/function"
+
+  function_name = "${local.name}_lambda_db_migration"
+  description   = "My test create_book_lambda lambda migrations"
+  handler       = "lambda-migrations.handler"
+  runtime       = "nodejs20.x"
+  aim_role_arn  = module.lambda_role.arn
+  layers_arn    = [module.lambda_modules_layer.arn]
+  filename      = data.archive_file.lambda_zip.output_path
+
+  source_dir    = "../server/dist"
+  artifacts_dir = local.artifacts_dir
+  force         = "3"
+  timeout       = 60
+
+  vpc_subnet_ids  = module.vpc.public_subnets
+  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+
+  environment_variables = {
+    NODE_ENV = local.env
+    #    DB_QUERY_LOGGING=true
+    DATABASE_SCHEMA    = "boo_creator"
+    DATABASE_NAME      = module.rds_postgres.rds_database_name
+    DATABASE_HOST      = module.rds_postgres.rds_hostname
+    DATABASE_USERNAME  = module.rds_postgres.rds_username
+    DATABASE_PASSWORD  = module.rds_postgres.rds_password
+    DATABASE_PORT      = module.rds_postgres.rds_port
+    DATABASE_SSL       = true
+    DATABASE_POOL_SIZE = 2
+  }
+
+  depends_on = [
+    module.vpc,
+    module.lambda_modules_layer.arn,
+    terraform_data.code_build,
+    module.rds_postgres,
+    data.archive_file.lambda_zip
   ]
 }
 
@@ -154,6 +206,9 @@ module "api-gtw" {
   name              = "${local.name}-api-gtw"
   stage_name        = local.env
   lambda_invoke_arn = module.lambda.invoke_arn
+  depends_on = [
+    module.lambda
+  ]
 }
 
 
@@ -162,16 +217,15 @@ resource "random_password" "master_db" {
   special = false
 }
 
-module "aurora_serverless" {
-  source                  = "./modules/rds"
-  name                    = local.name
-  master_username         = "root"
-  backup_retention_period = 7
-  master_password         = random_password.master_db.result
-  subnets                 = module.vpc.public_subnets
-  availability_zones      = local.availability_zones
-  depends_on              = [module.vpc]
+module "rds_postgres" {
+  source = "./modules/rds/postgresRds"
+  name = local.name
+  env = local.env
+  subnets = module.vpc.database_subnets
+  vpc_id = module.vpc.vpc_id
 }
+
+
 
 
 

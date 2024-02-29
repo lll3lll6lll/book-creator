@@ -56,11 +56,26 @@ variable "layers_arn" {
   default = null
 }
 
+variable "source_code_hash" {
+  type    = string
+  description = "Used to trigger updates. Must be set to a base64-encoded SHA256 hash of the package file specified with either filename or s3_key"
+}
+
 variable "force" {
   type    = string
   default = ""
 }
 
+variable "filename" {
+  description = "Path to the function's deployment package within the local filesystem. Exactly one of filename, image_uri, or s3_bucket must be specified."
+  type    = string
+}
+
+variable "timeout" {
+  description = "Amount of time your Lambda Function has to run in seconds. Defaults to 3"
+  type    = string
+  default = 3
+}
 
 
 ##########################

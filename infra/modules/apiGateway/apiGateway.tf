@@ -54,14 +54,6 @@ resource "aws_apigatewayv2_integration" "lambda" {
   api_id           = aws_apigatewayv2_api.this.id
   integration_uri  = var.lambda_invoke_arn
   integration_type = "AWS_PROXY"
+  integration_method = "POST"
 }
 
-
-#resource "aws_apigatewayv2_deployment" "this" {
-#  api_id      = aws_apigatewayv2_api.this.id
-#  description = "deployment"
-#
-#  lifecycle {
-#    create_before_destroy = true
-#  }
-#}

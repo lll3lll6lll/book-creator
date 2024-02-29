@@ -64,3 +64,20 @@ variable "master_password" {
   default     = null
 }
 
+variable "security_group_rules" {
+  description = "Map of security group rules to add to the cluster security group created"
+  type        = any
+  default     = {}
+}
+
+variable "vpc_id" {
+  description = "ID of the VPC where to create security group"
+  type        = string
+  default     = ""
+}
+
+variable "env" {
+  type        = string
+  default     = ""
+}
+
