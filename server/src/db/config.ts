@@ -11,7 +11,7 @@ export const dbConfig: PostgresConnectionOptions = {
   migrations: [join(__dirname, `/migrations/*${extname(__filename)}`)],
   migrationsTableName: 'migrations_history',
   synchronize: false,
-  migrationsRun: true,
+  migrationsRun: false,
   host: process.env.DATABASE_HOST,
   port: Number(process.env.DATABASE_PORT),
   database: process.env.DATABASE_NAME,
