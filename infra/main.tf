@@ -42,13 +42,6 @@ locals {
   ])
 }
 
-#module "storage" {
-#  source = "./modules/aws_s3_storage"
-#  bucket_name = "simple-test-llllllllll---3333"
-#  files_path = "test_app"
-#  acl = "public-read"
-#}
-
 module "vpc" {
   source                  = "./modules/network/vpc"
   name                    = local.name
@@ -135,7 +128,7 @@ module "lambda" {
     NODE_ENV = local.env
 
     #    DB_QUERY_LOGGING=true
-    #    DATABASE_SCHEMA=boo_creator
+    DATABASE_SCHEMA    = "boo_creator"
     DATABASE_NAME      = module.rds_postgres.rds_database_name
     DATABASE_HOST      = module.rds_postgres.rds_hostname
     DATABASE_USERNAME  = module.rds_postgres.rds_username
@@ -226,7 +219,38 @@ module "rds_postgres" {
 }
 
 
+locals {
+  site_name =  "mermesa"
+}
 
+module "app_build" {
+  source = "./app/build"
+  artifacts_dir = "temp"
+  aws_tags = {}
+  namespace = "mermesa"
+  s3_bucket_name_client_build = {
+    bucket = "${local.site_name}-build-dev"
+    key    = "client-build"
+  }
+  root_dir = "/home/user/my_projects/book-creator"
+}
+
+module "app_deploy" {
+  source = "./app/deploy"
+  artifacts_dir = "temp"
+  env = "dev"
+  s3_bucket_name_client_build = {
+    bucket = "${local.site_name}-build-dev"
+    key = "client-build"
+  }
+  s3_bucket_name_client_deploy = {
+    bucket = "${local.site_name}-deploy-dev"
+    key = "client-deploy"
+  }
+
+  depends_on = [module.app_build]
+  aws_tags   = { Name: "mermesa" }
+}
 
 
 
