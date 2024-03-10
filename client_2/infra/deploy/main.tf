@@ -11,11 +11,11 @@ data "aws_s3_bucket" "target" {
 
 locals {
   version_id =data.aws_s3_object.src.version_id
-  temp_file = "${abspath(path.root)}/${var.artifacts_dir}/${var.s3_bucket_name_client_deploy.key}.zip"
-  temp_dir  = "${abspath(path.root)}/${var.artifacts_dir}/${var.s3_bucket_name_client_deploy.key}"
+  temp_file = "${abspath(path.root)}/${var.artifacts_dir}.zip"
+  temp_dir  = "${abspath(path.root)}/${var.artifacts_dir}"
 
   key = replace(replace(try(var.s3_bucket_name_client_deploy.key, ""), "/[/]+$/", ""), "/^[/]+/", "")
-  s3_target_key = local.key == "" ? "/" : "/${var.s3_bucket_name_client_deploy.key}/"
+  s3_target_key = local.key == "" ? "/" : "/"
 
   remove_filter = local.key == "" ? "--include '*'" : "--exclude '*' --include ${local.key}/*"
   cf_invalidation_filter = local.key == "" ? "'/*'" : "'/${local.key}/*'"
@@ -27,7 +27,7 @@ resource "terraform_data" "deploy" {
   triggers_replace = {
     object = var.s3_bucket_name_client_build
     target = var.s3_bucket_name_client_deploy
-    force  = timestamp()
+#    force  = timestamp()
   }
 
   provisioner "local-exec" {

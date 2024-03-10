@@ -237,7 +237,7 @@ module "app_build" {
 
 module "app_deploy" {
   source = "./app/deploy"
-  artifacts_dir = "temp"
+  artifacts_dir = "temp/client-deploy"
   env = "dev"
   s3_bucket_name_client_build = {
     bucket = "${local.site_name}-build-dev"
@@ -245,7 +245,7 @@ module "app_deploy" {
   }
   s3_bucket_name_client_deploy = {
     bucket = "${local.site_name}-deploy-dev"
-    key = "client-deploy"
+    key = ""
   }
 
   depends_on = [module.app_build]

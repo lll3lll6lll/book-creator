@@ -7,13 +7,22 @@ resource "aws_cloudfront_origin_access_identity" "cf" {
   comment = "${local.origin_id}-distribution"
 }
 
+#resource "aws_cloudfront_origin_access_control" "oac" {
+#  name        = "my-oac"
+#  description = "OAC for S3 origin"
+#  origin_access_control_origin_type = "s3"
+#  signing_behavior                  = "always"
+#  signing_protocol                  = "sigv4"
+#}
+
 
 resource "aws_cloudfront_distribution" "ui" {
   origin {
-    domain_name = data.aws_s3_bucket.client-build.bucket_regional_domain_name
+    domain_name = data.aws_s3_bucket.client-deploy.bucket_regional_domain_name
     origin_id   = local.origin_id
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.cf.cloudfront_access_identity_path
+#      origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
     }
   }
 
@@ -52,6 +61,12 @@ resource "aws_cloudfront_distribution" "ui" {
     cloudfront_default_certificate = true
   }
 
+#  viewer_certificate {
+#    acm_certificate_arn = aws_acm_certificate.cert.arn
+#    ssl_support_method  = "sni-only"
+#    minimum_protocol_version = "TLSv1.2_2021"
+#  }
+
   custom_error_response {
     error_caching_min_ttl = 300
     error_code = 403
@@ -61,3 +76,9 @@ resource "aws_cloudfront_distribution" "ui" {
 
   price_class  = "PriceClass_100"
 }
+
+
+#resource "aws_acm_certificate" "cert" {
+#  domain_name       = "mermesa.com"
+#  validation_method = "DNS"
+#}
