@@ -1,4 +1,4 @@
-name: mermese
+name: mermesa
 on:
   push:
     branches:
