@@ -7,6 +7,9 @@ jobs:
   my-testings:
     runs-on: ubuntu-latest
     steps:
+      - name: List current folders
+        run: ls -la
+
       - name: clone repo ...
         uses: actions/checkout@v4
 
