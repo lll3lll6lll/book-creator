@@ -1,0 +1,11 @@
+name: mermese
+on:
+  push:
+    branches:
+      [-main]
+jobs:
+  my-testings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: print test message
+        run: echo "test github actions"
