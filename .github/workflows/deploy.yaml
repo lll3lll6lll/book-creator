@@ -2,10 +2,16 @@ name: mermese
 on:
   push:
     branches:
-      [-main]
+      - main
 jobs:
   my-testings:
     runs-on: ubuntu-latest
     steps:
-      - name: print test message
-        run: echo "test github actions"
+      - name: clone repo ...
+        uses: actions/checkout@v4
+
+      - name: List current folders
+        run: ls -la
+
+      - name: Check aws
+        run: aws --version
