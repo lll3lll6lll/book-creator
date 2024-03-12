@@ -2,7 +2,7 @@ name: mermesa
 on:
   push:
     branches:
-      [-main]
+      - main
 jobs:
   my-testings:
     runs-on: ubuntu-latest
