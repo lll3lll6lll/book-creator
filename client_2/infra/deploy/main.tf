@@ -11,8 +11,8 @@ data "aws_s3_bucket" "target" {
 
 locals {
   version_id =data.aws_s3_object.src.version_id
-  temp_file = "${abspath(path.root)}/${var.artifacts_dir}.zip"
-  temp_dir  = "${abspath(path.root)}/${var.artifacts_dir}"
+  temp_file = "${var.root_dir}/${var.artifacts_dir}.zip"
+  temp_dir  = "${var.root_dir}/${var.artifacts_dir}"
 
   key = replace(replace(try(var.s3_bucket_name_client_deploy.key, ""), "/[/]+$/", ""), "/^[/]+/", "")
   s3_target_key = local.key == "" ? "/" : "/"

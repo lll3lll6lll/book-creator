@@ -22,7 +22,7 @@ module "triggers" {
 locals {
   project_name      = "client_2"
   project_dir       = "${var.root_dir}/${local.project_name}"
-  target_dir        = "${abspath(path.root)}/${var.artifacts_dir}"
+  target_dir        = "${var.root_dir}/${var.artifacts_dir}"
   archive_full_name = "${local.target_dir}/${var.s3_bucket.key}.zip"
   s3_key            = var.s3_bucket.key
 }

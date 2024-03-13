@@ -6,6 +6,10 @@ variable "env" {
   type = string
 }
 
+variable "root_dir" {
+  type = string
+}
+
 variable "s3_bucket_name_client_build" {
   type = object({
     bucket      = string

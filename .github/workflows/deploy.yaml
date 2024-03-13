@@ -3,18 +3,80 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+env:
+  AWS_REGION: "eu-central-1"
 jobs:
-  my-testings:
+  app-build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: read
+    env:
+      CONFIG_DIRECTORY: "infra/env/dev/build"
     steps:
-      - name: List current folders
-        run: ls -la
-
       - name: clone repo ...
         uses: actions/checkout@v4
+        run: echo "repo cloned"
+        working-directory: .
 
-      - name: List current folders
-        run: ls -la
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_WEB_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Check aws
-        run: aws --version
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: "Terraform init: ${{ env.CONFIG_DIRECTORY }}"
+        run: cd ${{ env.CONFIG_DIRECTORY }} && terraform init
+
+      - name: "Terraform validate: ${{ env.CONFIG_DIRECTORY }}"
+        run: cd ${{ env.CONFIG_DIRECTORY }} && terraform validate
+
+      - name: "Terraform apply: ${{ env.CONFIG_DIRECTORY }}"
+        run: |
+          cd ${{ env.CONFIG_DIRECTORY }} 
+          terraform apply -auto-approve
+
+  app-deploy:
+    runs-on: ubuntu-latest
+    needs: app-build
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: read
+    env:
+      CONFIG_DIRECTORY: "infra/env/dev/deploy"
+    steps:
+      - name: clone repo ...
+        uses: actions/checkout@v4
+        run: echo "repo cloned"
+        working-directory: .
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_WEB_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}

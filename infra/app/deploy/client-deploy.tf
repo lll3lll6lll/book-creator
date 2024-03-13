@@ -5,4 +5,5 @@ module "client-deploy" {
   env = var.env
   s3_bucket_name_client_build = var.s3_bucket_name_client_build
   s3_bucket_name_client_deploy = var.s3_bucket_name_client_deploy
+  root_dir =  var.root_dir
 }
