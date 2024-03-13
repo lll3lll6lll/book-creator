@@ -18,6 +18,10 @@ locals {
   site_name = "mermesa"
 }
 
+variable "root_dir" {
+  type = string
+}
+
 module "app_deploy" {
   source = "../../../app/deploy"
   artifacts_dir = "temp/client-deploy"
@@ -31,5 +35,5 @@ module "app_deploy" {
     key = ""
   }
   aws_tags   = { Name: "mermesa" }
-  root_dir   = ""
+  root_dir   = var.root_dir
 }

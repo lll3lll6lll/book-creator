@@ -13,6 +13,10 @@ terraform {
   }
 }
 
+variable "root_dir" {
+  type = string
+}
+
 module "app_build" {
   source = "../../..//app/build"
   artifacts_dir = "infra/temp"
@@ -22,5 +26,5 @@ module "app_build" {
     bucket = "mermesa-build-dev"
     key    = "client-build"
   }
-  root_dir = ""
+  root_dir = var.root_dir
 }
