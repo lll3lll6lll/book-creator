@@ -56,9 +56,9 @@ jobs:
 
       - name: "Terraform apply: ${{ env.CONFIG_DIRECTORY }}"
         run: |
-          export TF_VAR_root_dir="${{ github.workspace }}"
+          export TF_VAR_root_dir="${{github.workspace}}"
           echo $TF_VAR_app_root_dir
-          cd ${{ env.CONFIG_DIRECTORY }} 
+          cd ${{github.workspace}}/${{ env.CONFIG_DIRECTORY }} 
           terraform apply -auto-approve
 
   app-deploy:
