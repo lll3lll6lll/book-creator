@@ -26,10 +26,6 @@ jobs:
     steps:
       - name: clone repo ...
         uses: actions/checkout@v4
-#        working-directory: .
-
-      - name: Вывести текущую директорию
-        run: pwd
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -45,14 +41,8 @@ jobs:
       - name: "Terraform init: ${{ env.CONFIG_DIRECTORY }}"
         run: cd ${{ env.CONFIG_DIRECTORY }} && terraform init
 
-      - name: Вывести текущую директорию
-        run: pwd
-
       - name: "Terraform validate: ${{ env.CONFIG_DIRECTORY }}"
         run: cd ${{ env.CONFIG_DIRECTORY }} && terraform validate
-
-      - name: Вывести текущую директорию
-        run: pwd
 
       - name: "Terraform apply: ${{ env.CONFIG_DIRECTORY }}"
         run: |
@@ -77,7 +67,6 @@ jobs:
     steps:
       - name: clone repo ...
         uses: actions/checkout@v4
-#        working-directory: .
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
