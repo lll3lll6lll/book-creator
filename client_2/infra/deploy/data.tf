@@ -4,6 +4,7 @@ data aws_s3_bucket "client-build" {
 
 data aws_s3_bucket "client-deploy" {
   bucket = var.s3_bucket_name_client_deploy.bucket
+  depends_on = [module.bucket_client_deploy ]
 }
 
 data aws_s3_object "client-build-src" {

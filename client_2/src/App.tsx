@@ -18,7 +18,7 @@ function App() {
         >
           Learn React
         </a>
-        Check GithubActions
+        Check GithubActions !!!
       </header>
     </div>
   );

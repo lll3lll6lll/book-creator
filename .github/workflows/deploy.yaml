@@ -48,7 +48,7 @@ jobs:
         run: |
           export TF_VAR_root_dir="${{github.workspace}}"
           echo $TF_VAR_app_root_dir
-          cd ${{github.workspace}}/${{ env.CONFIG_DIRECTORY }} 
+          cd  ${{ env.CONFIG_DIRECTORY }} 
           terraform apply -auto-approve
 
   app-deploy:
@@ -78,3 +78,16 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: "Terraform init: ${{ env.CONFIG_DIRECTORY }}"
+        run: cd ${{ env.CONFIG_DIRECTORY }} && terraform init
+
+      - name: "Terraform validate: ${{ env.CONFIG_DIRECTORY }}"
+        run: cd ${{ env.CONFIG_DIRECTORY }} && terraform validate
+
+      - name: "Terraform apply: ${{ env.CONFIG_DIRECTORY }}"
+        run: |
+          export TF_VAR_root_dir="${{github.workspace}}"
+          echo $TF_VAR_app_root_dir
+          cd ${{ env.CONFIG_DIRECTORY }} 
+          terraform apply -auto-approve

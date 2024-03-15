@@ -250,6 +250,7 @@ module "app_deploy" {
 
   depends_on = [module.app_build]
   aws_tags   = { Name: "mermesa" }
+  root_dir   = ""
 }
 
 
