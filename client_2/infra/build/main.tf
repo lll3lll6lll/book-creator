@@ -30,7 +30,7 @@ locals {
 resource "terraform_data" "build" {
   triggers_replace = {
     triggers = module.triggers.triggers
-#    force = timestamp()
+    force = timestamp()
   }
   depends_on = [module.client_build_bucket]
 
