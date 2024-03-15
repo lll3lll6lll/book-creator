@@ -27,7 +27,7 @@ resource "terraform_data" "deploy" {
   triggers_replace = {
     object = var.s3_bucket_name_client_build
     target = var.s3_bucket_name_client_deploy
-#    force  = timestamp()
+    force  = timestamp()
   }
 
   provisioner "local-exec" {
