@@ -9,7 +9,7 @@ variable "root_dir" {
 
 module "app_deploy" {
   source = "../../../app/deploy"
-  artifacts_dir = "temp/client-deploy"
+  artifacts_dir = "infra/temp/client-deploy"
   env = "dev"
   s3_bucket_name_client_build = {
     bucket = "${local.site_name}-build-dev"

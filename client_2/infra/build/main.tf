@@ -41,11 +41,12 @@ resource "terraform_data" "build" {
       rm -f "${local.archive_full_name}" || true
 
       set -e
-      cd "${local.project_dir}/build"
+      cd "${local.project_dir}"
       export NODE_ENV=production
-
       npm ci
       npm run build
+
+      cd build
       zip -qr9 "${local.archive_full_name}" .
       aws s3 cp "${local.archive_full_name}" "s3://${data.aws_s3_bucket.src.bucket}/${local.s3_key}"
     EOT
