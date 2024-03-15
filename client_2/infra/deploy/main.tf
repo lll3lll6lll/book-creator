@@ -10,6 +10,9 @@ data "aws_s3_bucket" "target" {
 }
 
 locals {
+  project_name      = "client_2"
+  project_dir       = "${var.root_dir}/${local.project_name}"
+
   version_id =data.aws_s3_object.src.version_id
   temp_file = "${var.root_dir}/${var.artifacts_dir}.zip"
   temp_dir  = "${var.root_dir}/${var.artifacts_dir}"
@@ -21,13 +24,22 @@ locals {
   cf_invalidation_filter = local.key == "" ? "'/*'" : "'/${local.key}/*'"
 }
 
+module "triggers" {
+  source = "../../../infra/modules/builders/trigger"
+  app_absolute_path = local.project_dir
+  file_extensions  = ["ts", "tsx", "js", "jsx", "json", "css", "html"]
+  dirs        = ["src"]
+  files       = ["package.json","package-lock.json", "tsconfig.json",]
+}
+
 
 resource "terraform_data" "deploy" {
   depends_on = [data.aws_s3_object.src, data.aws_s3_bucket.target]
   triggers_replace = {
+    triggers = module.triggers.triggers
     object = var.s3_bucket_name_client_build
     target = var.s3_bucket_name_client_deploy
-    force  = timestamp()
+#    force  = timestamp()
   }
 
   provisioner "local-exec" {
