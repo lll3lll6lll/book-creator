@@ -47,6 +47,10 @@ resource "aws_s3_bucket_website_configuration" "bucket_website" {
     key = "error.html"
   }
 }
+// 			{
+// 				"AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E5VDYQNUD28AZ"
+// 			},
+
 
 #resource "aws_s3_bucket_public_access_block" "public_access_block" {
 #  bucket = aws_s3_bucket.this.id
