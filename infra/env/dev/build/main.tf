@@ -2,10 +2,11 @@
 
 variable "root_dir" {
   type = string
+  default = "/home/user/my_projects/book-creator"
 }
 
 module "app_build" {
-  source = "../../..//app/build"
+  source = "../../../app/build"
   artifacts_dir = "infra/temp"
   aws_tags = {}
   namespace = "mermesa"
@@ -14,4 +15,7 @@ module "app_build" {
     key    = "client-build"
   }
   root_dir = var.root_dir
+  s3_bucket_name_server_build = {
+    bucket = "mermesa-server-dev"
+  }
 }

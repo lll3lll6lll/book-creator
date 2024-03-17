@@ -63,40 +63,40 @@ module "lambda_role" {
   ]
 }
 
-module "pack_node_modules" {
-  source               = "./modules/builders/nodejs_zip"
-  name                 = "${local.name}_node_modules"
-  force                = "8"
-  artifacts_dir        = local.artifacts_dir
-  path_to_package_json = "../server"
-}
+#module "pack_node_modules" {
+#  source               = "./modules/builders/nodejs_zip"
+#  name                 = "${local.name}_node_modules"
+#  force                = "8"
+#  artifacts_dir        = local.artifacts_dir
+#  path_to_package_json = "../server"
+#}
 
-module "lambda_modules_layer" {
-  source           = "./modules/lambda/layer"
-  filename         = module.pack_node_modules.output_path
-  name             = "${local.name}_node_modules"
-  runtime          = "nodejs20.x"
-  source_code_hash = module.pack_node_modules.output_base64sha256
-  depends_on       = [module.pack_node_modules]
+#module "lambda_modules_layer" {
+#  source           = "./modules/lambda/layer"
+#  filename         = module.pack_node_modules.output_path
+#  name             = "${local.name}_node_modules"
+#  runtime          = "nodejs20.x"
+#  source_code_hash = module.pack_node_modules.output_base64sha256
+#  depends_on       = [module.pack_node_modules]
+#
+#}
 
-}
-
-resource "terraform_data" "code_build" {
-  triggers_replace = {
-    force      = "4",
-    src_length = length(local.src_files)
-    src_hash   = sha256(join("", [for f in local.src_files : file("./${f}")]))
-  }
-
-  provisioner "local-exec" {
-    command = <<-EOT
-
-    cd "${local.src}"
-    npm run build
-
-    EOT
-  }
-}
+#resource "terraform_data" "code_build" {
+#  triggers_replace = {
+#    force      = "4",
+#    src_length = length(local.src_files)
+#    src_hash   = sha256(join("", [for f in local.src_files : file("./${f}")]))
+#  }
+#
+#  provisioner "local-exec" {
+#    command = <<-EOT
+#
+#    cd "${local.src}"
+#    npm run build
+#
+#    EOT
+#  }
+#}
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
@@ -112,7 +112,7 @@ module "lambda" {
   handler       = "lambda.handler"
   runtime       = "nodejs20.x"
   aim_role_arn  = module.lambda_role.arn
-  layers_arn    = [module.lambda_modules_layer.arn]
+#  layers_arn    = [module.lambda_modules_layer.arn]
   filename      = data.archive_file.lambda_zip.output_path
 
   source_dir    = "../server/dist"
@@ -145,8 +145,8 @@ module "lambda" {
 
   depends_on = [
     module.vpc,
-    module.lambda_modules_layer.arn,
-    terraform_data.code_build,
+#    module.lambda_modules_layer.arn,
+#    terraform_data.code_build,
     module.rds_postgres,
     data.archive_file.lambda_zip
   ]
@@ -160,7 +160,7 @@ module "lambda_db_migrations" {
   handler       = "lambda-migrations.handler"
   runtime       = "nodejs20.x"
   aim_role_arn  = module.lambda_role.arn
-  layers_arn    = [module.lambda_modules_layer.arn]
+#  layers_arn    = [module.lambda_modules_layer.arn]
   filename      = data.archive_file.lambda_zip.output_path
 
   source_dir    = "../server/dist"
@@ -187,8 +187,8 @@ module "lambda_db_migrations" {
 
   depends_on = [
     module.vpc,
-    module.lambda_modules_layer.arn,
-    terraform_data.code_build,
+#    module.lambda_modules_layer.arn,
+#    terraform_data.code_build,
     module.rds_postgres,
     data.archive_file.lambda_zip
   ]
@@ -233,6 +233,7 @@ module "app_build" {
     key    = "client-build"
   }
   root_dir = "/home/user/my_projects/book-creator"
+  s3_bucket_name_server_build = {}
 }
 
 module "app_deploy" {

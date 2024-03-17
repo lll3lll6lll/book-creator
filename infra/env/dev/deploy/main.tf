@@ -1,10 +1,11 @@
+variable "root_dir" {
+  type = string
+  default = "/home/user/my_projects/book-creator"
+}
+
 
 locals {
   site_name = "mermesa"
-}
-
-variable "root_dir" {
-  type = string
 }
 
 module "app_deploy" {

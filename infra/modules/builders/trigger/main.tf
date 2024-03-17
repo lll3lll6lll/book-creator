@@ -5,11 +5,13 @@ variable "app_absolute_path" {
 
 variable "dirs" {
   type = list(string)
+  default = []
   #  default = ["src"]
 }
 
 variable "files" {
   type = list(string)
+  default = []
   #  default = ["package.json","package-lock.json", "tsconfig.json"]
 }
 

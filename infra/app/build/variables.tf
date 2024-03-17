@@ -17,6 +17,12 @@ variable "s3_bucket_name_client_build" {
   })
 }
 
+variable "s3_bucket_name_server_build" {
+  type = object({
+    bucket  = string
+  })
+}
+
 variable "aws_tags" {
   type = map(string)
 }
