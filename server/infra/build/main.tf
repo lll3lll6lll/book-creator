@@ -10,7 +10,7 @@ module "triggers_src" {
 resource "terraform_data" "server_code_build" {
   triggers_replace = {
     triggers = module.triggers_src.triggers
-#    force = timestamp()
+    force = timestamp()
   }
 
   depends_on = [module.server_bucket]
