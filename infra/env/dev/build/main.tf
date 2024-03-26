@@ -1,9 +1,12 @@
-
-
 variable "root_dir" {
   type = string
   default = "/home/user/my_projects/book-creator"
 }
+
+locals {
+  site_name = "mermesa"
+}
+
 
 module "app_build" {
   source = "../../../app/build"
@@ -15,7 +18,6 @@ module "app_build" {
     key    = "client-build"
   }
   root_dir = var.root_dir
-  s3_bucket_name_server_build = {
-    bucket = "mermesa-server-dev"
-  }
+  env  = "dev"
+  site_name =   local.site_name
 }

@@ -13,7 +13,7 @@ resource "terraform_data" "server_code_build" {
 #    force = timestamp()
   }
 
-  depends_on = [module.server_build_bucket]
+  depends_on = [module.server_bucket]
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]

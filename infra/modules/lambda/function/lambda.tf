@@ -8,8 +8,11 @@ resource "aws_lambda_function" "this" {
   role             = var.aim_role_arn
   runtime          = var.runtime
   layers           = var.layers_arn
-  source_code_hash = "${var.source_code_hash}_${var.force}"
+  source_code_hash = var.source_code_hash
   timeout          = var.timeout
+  s3_bucket        = var.s3_bucket
+  s3_key           = var.s3_key
+  s3_object_version = var.s3_object_version
 
   environment {
     variables = var.environment_variables

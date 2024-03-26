@@ -1,5 +1,5 @@
 #====================VARIABLES================
-variable "name" {
+variable "layer_name" {
   description = "Unique name for your Lambda Layer"
   type        = string
 }
@@ -12,6 +12,12 @@ variable "s3_bucket" {
 variable "s3_key" {
   description = "S3 key of an object containing the function's deployment package. Conflicts with filename"
   type        = string
+}
+
+variable "s3_object_version" {
+  description = "Object version containing the function's deployment package. Conflicts with filename and image_uri."
+  type    = string
+  default = null
 }
 
 variable "runtime" {
@@ -65,11 +71,12 @@ output "signing_profile_version_arn" {
 #==============RESOURCES========================
 
 resource "aws_lambda_layer_version" "layer" {
-  layer_name          = var.name
+  layer_name          = var.layer_name
   compatible_runtimes = [var.runtime]
   source_code_hash    = var.source_code_hash
   s3_bucket           = var.s3_bucket
   s3_key              = var.s3_key
+  s3_object_version = var.s3_object_version
   description         = var.description
 
 }

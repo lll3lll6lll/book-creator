@@ -18,14 +18,14 @@ variable "environment_variables" {
 variable "vpc_security_group_ids" {
   description = "List of security group ids when Lambda Function should run in the VPC."
   type        = list(string)
-  default     = null
+  default     = []
 }
 
 
 variable "vpc_subnet_ids" {
   description = "List of subnet ids when Lambda Function should run in the VPC. Usually private or intra subnets."
   type        = list(string)
-  default     = null
+  default     = []
 }
 
 variable "tags" {
@@ -58,17 +58,8 @@ variable "layers_arn" {
 
 variable "source_code_hash" {
   type    = string
+  default     = null
   description = "Used to trigger updates. Must be set to a base64-encoded SHA256 hash of the package file specified with either filename or s3_key"
-}
-
-variable "force" {
-  type    = string
-  default = ""
-}
-
-variable "filename" {
-  description = "Path to the function's deployment package within the local filesystem. Exactly one of filename, image_uri, or s3_bucket must be specified."
-  type    = string
 }
 
 variable "timeout" {
@@ -77,17 +68,29 @@ variable "timeout" {
   default = 3
 }
 
-
-##########################
-# Build artifact settings
-##########################
-
-variable "source_dir" {
-  description = "The absolute path to a local file or directory containing your Lambda source code"
-  type        = string
+variable "filename" {
+  description = "Path to the function's deployment package within the local filesystem. Exactly one of filename, image_uri, or s3_bucket must be specified."
+  type    = string
+  default = null
 }
 
-variable "artifacts_dir" {
-  description = "Directory name where temp files should be stored"
-  type        = string
+variable "s3_bucket" {
+  description = "S3 bucket location containing the function's deployment package. This bucket must reside in the same AWS region where you are creating the Lambda function. Exactly one of filename, image_uri, or s3_bucket must be specified. When s3_bucket is set, s3_key is required."
+  type    = string
+  default = null
 }
+
+variable "s3_key" {
+  description = "S3 key of an object containing the function's deployment package. When s3_bucket is set, s3_key is required."
+  type    = string
+  default = null
+}
+
+variable "s3_object_version" {
+  description = "S Object version containing the function's deployment package. Conflicts with filename and image_uri."
+  type    = string
+  default = null
+}
+
+
+

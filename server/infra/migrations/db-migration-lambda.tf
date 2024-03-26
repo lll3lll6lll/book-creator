@@ -6,27 +6,24 @@ module "api-gtw-lambda-server" {
   depends_on = [  module.lambda_server ]
 }
 
-
 module "lambda_server" {
   source = "../../../infra/modules/lambda/function"
-  depends_on = [module.mermesa_node_modules]
 
-  function_name = local.lambda_name_server
+  function_name = "${var.name}_db_migration"
   description   = "lambda managed with terraform"
-  handler       = "lambda.handler"
+  handler       = "lambda-migrations.handler"
   runtime       = "nodejs20.x"
   aim_role_arn  =  aws_iam_role.server_lambda_role.arn
   layers_arn    = [data.aws_lambda_layer_version.node_modules_layer.arn]
 
-  s3_bucket     = data.aws_s3_object.s3_server.bucket
-  s3_key        = data.aws_s3_object.s3_server.key
-  s3_object_version = data.aws_s3_object.s3_server.version_id
+  s3_bucket     = var.s3_bucket_name
+  s3_key        = local.server_name_zip
 
   timeout       = 60
 
 #  vpc_subnet_ids  = module.vpc.public_subnets
 #  vpc_security_group_ids = [module.vpc.default_security_group_id]
-#  source_code_hash = data.aws_s3_object.s3_server.checksum_sha256
+  source_code_hash = local.server_name_hash
 
   environment_variables = {
     NODE_ENV           = var.env

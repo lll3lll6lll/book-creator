@@ -1,3 +1,11 @@
+variable "env" {
+  type = string
+}
+
+variable "name" {
+  type = string
+}
+
 variable "artifacts_dir" {
   type = string
 }
@@ -10,11 +18,6 @@ variable "aws_tags" {
   type = map(string)
 }
 
-
-variable "name" {
-  type = string
-}
-
-variable "env" {
+variable "s3_bucket_name" {
   type = string
 }

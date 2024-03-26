@@ -17,6 +17,7 @@ variable "s3_bucket_name_client_build" {
   })
 }
 
+
 variable "s3_bucket_name_client_deploy" {
   type = object({
     bucket      = string
@@ -26,4 +27,8 @@ variable "s3_bucket_name_client_deploy" {
 
 variable "aws_tags" {
   type = map(string)
+}
+
+variable "site_name" {
+  type = string
 }

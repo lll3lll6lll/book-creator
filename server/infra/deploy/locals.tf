@@ -1,4 +1,10 @@
 locals {
+  node_modules_bucket_name = "${var.name}-server-node-modules-${var.env}"
+  server_bucket_name = "${var.name}-server-${var.env}"
+
+  lambda_name_server = "${var.name}_lambda"
+  layer_name_nm = "mermesa_node_modules"
+
   project_dir       = "${var.root_dir}/server"
   target_dir        = "${var.root_dir}/${var.artifacts_dir}"
 

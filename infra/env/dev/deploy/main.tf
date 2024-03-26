@@ -10,8 +10,9 @@ locals {
 
 module "app_deploy" {
   source = "../../../app/deploy"
-  artifacts_dir = "infra/temp/client-deploy"
+  artifacts_dir = "infra/temp"
   env = "dev"
+  site_name = local.site_name
   s3_bucket_name_client_build = {
     bucket = "${local.site_name}-build-dev"
     key = "client-build"

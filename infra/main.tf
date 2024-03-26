@@ -52,16 +52,16 @@ module "vpc" {
   availability_zones      = local.availability_zones
 }
 
-module "lambda_role" {
-  source                     = "./modules/iam/role"
-  name                       = "ServiceRoleForLambda_${local.name}"
-  path_to_assume_role_policy = "./policies/lambda-trust-policy.json"
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AWSLambda_FullAccess",
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
-    "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
-  ]
-}
+#module "lambda_role" {
+#  source                     = "./modules/iam/role"
+#  name                       = "ServiceRoleForLambda_${local.name}"
+#  path_to_assume_role_policy = "./policies/lambda-trust-policy.json"
+#  managed_policy_arns = [
+#    "arn:aws:iam::aws:policy/AWSLambda_FullAccess",
+#    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+#    "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+#  ]
+#}
 
 #module "pack_node_modules" {
 #  source               = "./modules/builders/nodejs_zip"
@@ -98,59 +98,59 @@ module "lambda_role" {
 #  }
 #}
 
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = "../server/dist"
-  output_path = "${local.artifacts_dir}/${local.name}_lambda.zip"
-}
+#data "archive_file" "lambda_zip" {
+#  type        = "zip"
+#  source_dir  = "../server/dist"
+#  output_path = "${local.artifacts_dir}/${local.name}_lambda.zip"
+#}
 
-module "lambda" {
-  source = "./modules/lambda/function"
-
-  function_name = "${local.name}_lambda"
-  description   = "My test create_book_lambda lambda function"
-  handler       = "lambda.handler"
-  runtime       = "nodejs20.x"
-  aim_role_arn  = module.lambda_role.arn
-#  layers_arn    = [module.lambda_modules_layer.arn]
-  filename      = data.archive_file.lambda_zip.output_path
-
-  source_dir    = "../server/dist"
-  artifacts_dir = local.artifacts_dir
-  force         = "4"
-  timeout       = 60
-
-  vpc_subnet_ids  = module.vpc.public_subnets
-  vpc_security_group_ids = [module.vpc.default_security_group_id]
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-
-  environment_variables = {
-    NODE_ENV = local.env
-
-    #    DB_QUERY_LOGGING=true
-    DATABASE_SCHEMA    = "boo_creator"
-    DATABASE_NAME      = module.rds_postgres.rds_database_name
-    DATABASE_HOST      = module.rds_postgres.rds_hostname
-    DATABASE_USERNAME  = module.rds_postgres.rds_username
-    DATABASE_PASSWORD  = module.rds_postgres.rds_password
-    DATABASE_PORT      = module.rds_postgres.rds_port
-    DATABASE_SSL       = true
-    DATABASE_POOL_SIZE = 2
-
-    JWT_ACCESS_SECRET   = "secret-super-secret-token-access"
-    JWT_ACCESS_EXPIRED  = "40h"
-    JWT_REFRESH_SECRET  = "secret-super-secret-token-refresh"
-    JWT_REFRESH_EXPIRED = "60d"
-  }
-
-  depends_on = [
-    module.vpc,
-#    module.lambda_modules_layer.arn,
-#    terraform_data.code_build,
-    module.rds_postgres,
-    data.archive_file.lambda_zip
-  ]
-}
+#module "lambda" {
+#  source = "./modules/lambda/function"
+#
+#  function_name = "${local.name}_lambda"
+#  description   = "My test create_book_lambda lambda function"
+#  handler       = "lambda.handler"
+#  runtime       = "nodejs20.x"
+#  aim_role_arn  = module.lambda_role.arn
+##  layers_arn    = [module.lambda_modules_layer.arn]
+#  filename      = data.archive_file.lambda_zip.output_path
+#
+#  source_dir    = "../server/dist"
+#  artifacts_dir = local.artifacts_dir
+#  force         = "4"
+#  timeout       = 60
+#
+#  vpc_subnet_ids  = module.vpc.public_subnets
+#  vpc_security_group_ids = [module.vpc.default_security_group_id]
+#  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+#
+#  environment_variables = {
+#    NODE_ENV = local.env
+#
+#    #    DB_QUERY_LOGGING=true
+#    DATABASE_SCHEMA    = "boo_creator"
+#    DATABASE_NAME      = module.rds_postgres.rds_database_name
+#    DATABASE_HOST      = module.rds_postgres.rds_hostname
+#    DATABASE_USERNAME  = module.rds_postgres.rds_username
+#    DATABASE_PASSWORD  = module.rds_postgres.rds_password
+#    DATABASE_PORT      = module.rds_postgres.rds_port
+#    DATABASE_SSL       = true
+#    DATABASE_POOL_SIZE = 2
+#
+#    JWT_ACCESS_SECRET   = "secret-super-secret-token-access"
+#    JWT_ACCESS_EXPIRED  = "40h"
+#    JWT_REFRESH_SECRET  = "secret-super-secret-token-refresh"
+#    JWT_REFRESH_EXPIRED = "60d"
+#  }
+#
+#  depends_on = [
+#    module.vpc,
+##    module.lambda_modules_layer.arn,
+##    terraform_data.code_build,
+#    module.rds_postgres,
+#    data.archive_file.lambda_zip
+#  ]
+#}
 
 module "lambda_db_migrations" {
   source = "./modules/lambda/function"
@@ -190,19 +190,19 @@ module "lambda_db_migrations" {
 #    module.lambda_modules_layer.arn,
 #    terraform_data.code_build,
     module.rds_postgres,
-    data.archive_file.lambda_zip
+#    data.archive_file.lambda_zip
   ]
 }
 
-module "api-gtw" {
-  source            = "./modules/apiGateway"
-  name              = "${local.name}-api-gtw"
-  stage_name        = local.env
-  lambda_invoke_arn = module.lambda.invoke_arn
-  depends_on = [
-    module.lambda
-  ]
-}
+#module "api-gtw" {
+#  source            = "./modules/apiGateway"
+#  name              = "${local.name}-api-gtw"
+#  stage_name        = local.env
+#  lambda_invoke_arn = module.lambda.invoke_arn
+#  depends_on = [
+##    module.lambda
+#  ]
+#}
 
 
 resource "random_password" "master_db" {
@@ -222,38 +222,3 @@ module "rds_postgres" {
 locals {
   site_name =  "mermesa"
 }
-
-module "app_build" {
-  source = "./app/build"
-  artifacts_dir = "temp"
-  aws_tags = {}
-  namespace = "mermesa"
-  s3_bucket_name_client_build = {
-    bucket = "${local.site_name}-build-dev"
-    key    = "client-build"
-  }
-  root_dir = "/home/user/my_projects/book-creator"
-  s3_bucket_name_server_build = {}
-}
-
-module "app_deploy" {
-  source = "./app/deploy"
-  artifacts_dir = "temp/client-deploy"
-  env = "dev"
-  s3_bucket_name_client_build = {
-    bucket = "${local.site_name}-build-dev"
-    key = "client-build"
-  }
-  s3_bucket_name_client_deploy = {
-    bucket = "${local.site_name}-deploy-dev"
-    key = ""
-  }
-
-  depends_on = [module.app_build]
-  aws_tags   = { Name: "mermesa" }
-  root_dir   = ""
-}
-
-
-
-
